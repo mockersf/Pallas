@@ -1,0 +1,24 @@
+<VirtualHost *:7337>
+    ServerAdmin webmaster@localhost
+    ServerName demo_site
+
+    DocumentRoot /var/www/demo_site
+    <Directory />
+        Options FollowSymLinks
+        AllowOverride None
+    </Directory>
+        <Directory /var/www/demo_site>
+        Options Indexes FollowSymLinks MultiViews
+        AllowOverride None
+        Order allow,deny
+        allow from all
+    </Directory>
+
+    ErrorLog ${APACHE_LOG_DIR}/demo_site-error.log
+
+    # Possible values include: debug, info, notice, warn, error, crit,
+    # alert, emerg.
+    LogLevel warn
+
+    CustomLog ${APACHE_LOG_DIR}/demo_site-access.log combined
+</VirtualHost>

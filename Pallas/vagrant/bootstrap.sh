@@ -1,19 +1,8 @@
 #!/usr/bin/env bash
 
-apt-get update
-apt-get install -y unzip
-apt-get install -y firefox
-apt-get install -y xvfb
-apt-get install -y python-pip
-apt-get install -y default-jdk
-apt-get install -y apache2
-Xvfb :10 -ac
-rm -rf /var/www
-ln -fs /vagrant /var/www
-
-pip install selenium
-pip install browsermob-proxy
-echo "downloading browsermob proxy"
-wget -nv https://s3-us-west-1.amazonaws.com/lightbody-bmp/browsermob-proxy-2.0-beta-9-bin.zip
-unzip browsermob-proxy-2.0-beta-9-bin.zip
-export DISPLAY=:10
+#temporary issue between firefox and selenium
+wget -nv http://ftp.mozilla.org/pub/mozilla.org/firefox/releases/30.0/linux-i686/en-US/firefox-30.0.tar.bz2
+tar jxf firefox-30.0.tar.bz2
+mv /usr/lib/firefox /usr/lib/firefox_last
+mv firefox /usr/lib/firefox
+cp /usr/lib/firefox_last/firefox.sh /usr/lib/firefox/firefox.sh
