@@ -3,7 +3,7 @@ import logging
 import browsermobproxy
 from selenium import webdriver
 
-from Configuration import Configuration
+from Main.Configuration import Configuration
 
 class Browser:
     _driver = None

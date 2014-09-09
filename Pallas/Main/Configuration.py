@@ -1,7 +1,7 @@
 from argparse import ArgumentParser
 import logging
 
-from singleton import singleton
+from Main.singleton import singleton
 
 
 @singleton

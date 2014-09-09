@@ -1,8 +1,8 @@
 import logging
 from urlparse import urlparse
 
-from Configuration import Configuration
-from Browser import Browser
+from Main.Configuration import Configuration
+from Main.Browser import Browser
 
 config = Configuration()
 logging.basicConfig(format='%(asctime)s [%(levelname)s] %(message)s', level=config.get_log_level())
