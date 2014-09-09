@@ -4,6 +4,8 @@ import browsermobproxy
 from selenium import webdriver
 
 from Main.Configuration import Configuration
+from Site.Page import Page
+
 
 class Browser:
     _driver = None
@@ -54,3 +56,4 @@ class Browser:
             elems = []
         for elem in elems:
             logging.debug('%s %s %s' % (elem.tag_name, elem.get_attribute('type'), elem.get_attribute('id')))
+        return Page()
