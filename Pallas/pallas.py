@@ -11,9 +11,12 @@ url = config.target
 site = Site(url)
 
 browser = Browser()
-browser.start()
+browser.start(site)
 #strange behaviour from browsermob proxy, dsn doesn't always work
 browser.add_remap_urls([site.hostname])
-browser.get(site.url)
+browser.get()
 browser.study_state()
+for link in [elem['target'] for hash, page in site._pages.iteritems() for elem in page._interests if elem['type'] == 'link']:
+    logging.info(link)
+    browser.get(link)
 browser.stop()
