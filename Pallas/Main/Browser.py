@@ -43,7 +43,7 @@ class Browser:
         logging.debug('browser is ready')
         self._proxy_client.wait_for_traffic_to_stop(1000, 5000)
         logging.debug('no query ran for 1 second !')
-        page = self._site.current_page(self._driver.page_source)
+        page = self._site.current_page(self._driver.page_source, self._driver.current_url)
         for entry in self._proxy_client.har['log']['entries']:
             logging.debug("%-4s %s - %s" % (entry['request']['method'], entry['request']['url'], entry['response']['status']))
             page.add_call(entry)
@@ -57,7 +57,7 @@ class Browser:
         self.teardown('get')
 
     def study_state(self):
-        page = self._site.current_page(self._driver.page_source)
+        page = self._site.current_page(self._driver.page_source, self._driver.current_url)
         try:
             elems = self._driver.find_elements_by_tag_name("input")
         except:

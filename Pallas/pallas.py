@@ -16,7 +16,7 @@ browser.start(site)
 browser.add_remap_urls([site.hostname])
 browser.get()
 browser.study_state()
-for link in [elem['target'] for hash, page in site._pages.iteritems() for elem in page._interests if elem['type'] == 'link']:
+for link in [elem['target'] for hash, page in site._pages.items() for elem in page._interests if elem['type'] == 'link']:
     logging.info(link)
     browser.get(link)
 browser.stop()

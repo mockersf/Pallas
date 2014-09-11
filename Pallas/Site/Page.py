@@ -1,12 +1,14 @@
 import uuid
 
 class Page:
+    _url = None
     _id = None
     _title = None
     _interests = None
     _calls = None
     
-    def __init__(self):
+    def __init__(self, url):
+        self._url = url
         self._id = uuid.uuid4()
         self._interests = []
         self._calls = []

@@ -1,7 +1,10 @@
-from urlparse import urlparse
+try:
+    from urllib.parse import urlparse
+except ImportError:
+    from urlparse import urlparse
 import hashlib
 
-from Page import Page
+from .Page import Page
 
 class Site:
     _url = None
@@ -22,8 +25,8 @@ class Site:
     def hostname(self):
         return urlparse(self._url).hostname
     
-    def current_page(self, html_source):
+    def current_page(self, html_source, url):
         md5 = hashlib.md5(html_source.encode('utf-8')).hexdigest()
         if md5 not in self._pages:
-            self._pages[md5] = Page()
+            self._pages[md5] = Page(url)
         return self._pages[md5]
