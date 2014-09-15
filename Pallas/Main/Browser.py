@@ -12,21 +12,21 @@ class Browser:
     _proxy_server = None
     _proxy_client = None
     _site = None
-    
+
     def __init__(self):
         pass
-    
+
     def start(self, site):
         config = Configuration()
         browsermobproxy_bin = "" if config.proxy_path is None else config.proxy_path
         self._proxy_server = browsermobproxy.Server(browsermobproxy_bin + "browsermob-proxy")
         self._proxy_server.start()
         self._proxy_client = self._proxy_server.create_proxy()
-        profile  = webdriver.FirefoxProfile()
+        profile = webdriver.FirefoxProfile()
         profile.set_proxy(self._proxy_client.selenium_proxy())
         self._driver = webdriver.Firefox(firefox_profile=profile)
         self._site = site
-    
+
     def stop(self):
         self._proxy_server.stop()
         self._driver.quit()
@@ -38,17 +38,18 @@ class Browser:
 
     def setup(self, query):
         self._proxy_client.new_har(query)
-    
+
     def teardown(self, query):
         logging.debug('browser is ready')
         self._proxy_client.wait_for_traffic_to_stop(1000, 5000)
         logging.debug('no query ran for 1 second !')
         page = self._site.current_page(self._driver.page_source, self._driver.current_url)
         for entry in self._proxy_client.har['log']['entries']:
-            logging.debug("%-4s %s - %s" % (entry['request']['method'], entry['request']['url'], entry['response']['status']))
+            logging.debug("%-4s %s - %s" %
+                          (entry['request']['method'], entry['request']['url'], entry['response']['status']))
             page.add_call(entry)
 
-    def get(self, url = None):
+    def get(self, url=None):
         self.setup('get')
         if url is None:
             self._driver.get(self._site.url)

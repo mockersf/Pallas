@@ -12,11 +12,12 @@ site = Site(url)
 
 browser = Browser()
 browser.start(site)
-#strange behaviour from browsermob proxy, dsn doesn't always work
+# strange behaviour from browsermob proxy, dsn doesn't always work
 browser.add_remap_urls([site.hostname])
 browser.get()
 browser.study_state()
-for link in [elem['target'] for hash, page in site._pages.items() for elem in page._interests if elem['type'] == 'link']:
+for link in [elem['target'] for hash, page in site._pages.items()
+             for elem in page._interests if elem['type'] == 'link']:
     logging.info(link)
     browser.get(link)
 browser.stop()
