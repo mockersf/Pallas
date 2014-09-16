@@ -4,20 +4,32 @@ from Main.Configuration import Configuration
 from Main.Browser import Browser
 from Site.Site import Site
 
+
 config = Configuration()
 logging.basicConfig(format='%(asctime)s [%(levelname)s] %(message)s', level=config.get_log_level())
 
-url = config.target
-site = Site(url)
 
-browser = Browser()
-browser.start(site)
-# strange behaviour from browsermob proxy, dsn doesn't always work
-browser.add_remap_urls([site.hostname])
-browser.get()
-browser.study_state()
-for link in [elem['target'] for hash, page in site._pages.items()
-             for elem in page._interests if elem['type'] == 'link']:
-    logging.info(link)
-    browser.get(link)
-browser.stop()
+def check_website(url):
+    config = Configuration()
+    site = Site(url)
+
+    browser = Browser()
+    browser.start(site)
+
+    # strange behaviour from browsermob proxy, dsn doesn't always work
+    browser.add_remap_urls([site.hostname])
+
+    browser.get()
+    browser.study_state()
+    actions = site.get_first_connection_unexplored()
+    while actions is not None:
+        logging.info('%s action(s) needed to reach this connection' % (len(actions)))
+        for action in actions:
+            action.do()
+        browser.study_state()
+        actions = site.get_first_connection_unexplored()
+    site.show_graph()
+    browser.stop()
+
+if __name__ == '__main__':
+    check_website(config.target)
