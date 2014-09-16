@@ -6,7 +6,7 @@ import hashlib
 import logging
 import uuid
 
-from Site.Page import Page
+from .Page import Page
 from Main.Action import Action
 
 
