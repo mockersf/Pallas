@@ -1,3 +1,5 @@
 selenium
 browsermob-proxy
 pytest
+pytest-cov
+python-coveralls

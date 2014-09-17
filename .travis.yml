@@ -6,4 +6,7 @@ python:
   - 3.3
   - 3.4
 install: pip install -r pip_requirements.txt
-script: py.test Pallas/tests
+script:
+  - py.test Pallas/tests
+  - py.test --cov-reports term-missing Pallas/tests
+after_script: coveralls
