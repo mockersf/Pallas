@@ -7,13 +7,13 @@ from Main.singleton import singleton
 @singleton
 class Configuration(object):
 
-    def __init__(self):
+    def __init__(self, args=None):
         cli_parser = ArgumentParser()
         group = cli_parser.add_argument_group()
         group.add_argument("-v", "--log-level", help="Log level", type=str, default="INFO")
-        group.add_argument("-t", "--target", help="Log level", type=str, default="http://github.com/")
+        group.add_argument("-t", "--target", help="Log level", type=str, default="http://localhost/")
         group.add_argument("--proxy-path", help="Path to browsermob proxy executable", type=str, default=None)
-        cli_args = cli_parser.parse_args()
+        cli_args = cli_parser.parse_args(args)
 
         self._log_level = cli_args.log_level
         self._target = cli_args.target
