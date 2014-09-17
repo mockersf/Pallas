@@ -8,4 +8,4 @@ python:
 install: pip install -r pip_requirements.txt
 script:
   - py.test --cov-report term-missing --cov Pallas
-after_script: coveralls
+after_success: coveralls

@@ -26,7 +26,7 @@ class Site:
         self._connections = {}
 
     def __repr__(self):
-        return "<Site ('%s')" % (self._url)
+        return "<Site ('%s')>" % (self._url)
 
     @property
     def url(self):
