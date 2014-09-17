@@ -8,5 +8,5 @@ python:
 install: pip install -r pip_requirements.txt
 script:
   - py.test Pallas/tests
-  - py.test --cov-report --cov term-missing Pallas/tests
+  - py.test --cov-report term-missing --cov Pallas/tests
 after_script: coveralls
