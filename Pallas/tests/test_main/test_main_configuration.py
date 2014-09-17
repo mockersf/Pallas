@@ -20,3 +20,12 @@ class Test_Main_Configuration(object):
         assert config.get_log_level() == logging.INFO
         assert config.target == 'http://localhost/'
         assert config.proxy_path is None
+
+    def test_values(self):
+        from Main.Configuration import Configuration
+        target_url = str(uuid.uuid4())
+        path = str(uuid.uuid4())
+        config = Configuration(['-v', 'FATAL', '--target', target_url, '--proxy-path', path])
+        assert config.get_log_level() == logging.FATAL
+        assert config.target == target_url
+        assert config.proxy_path == path

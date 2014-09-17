@@ -13,12 +13,5 @@ class Test_imports(object):
     def teardown_method(self, method):
         pass
 
-    def test_Page(self):
-        from Site.Page import Page
-        page = Page('http://tests.com')
-
-    def test_Configuration(self):
-        from Main.Configuration import Configuration
-
     def test_Browser(self):
         from Main.Browser import Browser

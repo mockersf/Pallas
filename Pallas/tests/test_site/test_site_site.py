@@ -1,6 +1,7 @@
 import os.path
 import sys
 import uuid
+import hashlib
 
 def setup_module(module):
     sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..')))
@@ -23,8 +24,12 @@ class Test_Site_Site(object):
         from Site.Site import Site
         site = Site('http://google.com/')
         assert len(site._pages) == 0
-        site.current_page("<html></html>", 'http://google.com/')
+        url = str(uuid.uuid4())
+        page = site.current_page("<html></html>", url)
         assert len(site._pages) == 1
+        assert page._url == url
+        assert page._interests == []
+        assert page._calls == []
 
     def test_adding_two_page(self):
         from Site.Site import Site
@@ -38,9 +43,13 @@ class Test_Site_Site(object):
         from Site.Site import Site
         site = Site('http://google.com/')
         assert len(site._pages) == 0
-        site.current_page("<html></html>", 'http://google.com/')
-        site.current_page("<html></html>", 'http://google.com/')
+        page = site.current_page("<html></html>", 'http://google.com/')
         assert len(site._pages) == 1
+        call = str(uuid.uuid4())
+        page.add_call(call)
+        page2 = site.current_page("<html></html>", 'http://google.com/')
+        assert len(site._pages) == 1
+        assert page2._calls == [call]
 
     def test_repr_getter(self):
         from Site.Site import Site
@@ -59,7 +68,7 @@ class Test_Site_Site(object):
         connection1 = {'from': current_page, 'type': Site.ConnecionTypes.LINK, 'explored': False, 'to': None, 'data': {'url': url}}
         site.add_link(url)
         assert len(site._connections) == 1
-        assert site._connections.values()[0] == connection1
+        assert list(site._connections.values())[0] == connection1
         site.add_link(url)
         assert len(site._connections) == 1
 
@@ -159,3 +168,10 @@ class Test_Site_Site(object):
         assert actions[0]._type == Action.ActionType.CLICK
         assert actions[0].connection == connection_6_id
         assert actions[0].data['xpath'] == "//a[contains(@href, '%s')]" % connection_6_url
+        html = str('<html><body><div>test</div></body></html>')
+        page = site.current_page(html, '', connection_6_id)
+        assert site._connections[connection_6_id]['explored'] == True
+        assert site._connections[connection_6_id]['to'] == hashlib.md5(html.encode('utf-8')).hexdigest()
+        actions = site.get_first_connection_unexplored()
+        assert actions == None
+        
