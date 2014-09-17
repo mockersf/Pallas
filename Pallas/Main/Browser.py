@@ -3,10 +3,12 @@ import logging
 import browsermobproxy
 from selenium import webdriver
 
+from Main.singleton import singleton
 from Main.Configuration import Configuration
 from Site.Page import Page
 
 
+@singleton
 class Browser:
     _driver = None
     _proxy_server = None
@@ -39,11 +41,11 @@ class Browser:
     def setup(self, query):
         self._proxy_client.new_har(query)
 
-    def teardown(self, query):
+    def teardown(self, query, connection_id=None):
         logging.debug('browser is ready')
         self._proxy_client.wait_for_traffic_to_stop(1000, 5000)
         logging.debug('no query ran for 1 second !')
-        page = self._site.current_page(self._driver.page_source, self._driver.current_url)
+        page = self._site.current_page(self._driver.page_source, self._driver.current_url, connection_id)
         for entry in self._proxy_client.har['log']['entries']:
             logging.debug("%-4s %s - %s" %
                           (entry['request']['method'], entry['request']['url'], entry['response']['status']))
@@ -52,10 +54,23 @@ class Browser:
     def get(self, url=None):
         self.setup('get')
         if url is None:
+            logging.info('going to %s' % (self._site.url))
             self._driver.get(self._site.url)
         else:
+            logging.info('going to %s' % (url))
             self._driver.get(url)
         self.teardown('get')
+
+    def click(self, action):
+        self.setup('click')
+        logging.info('doing %s' % (action))
+        logging.info('current page %s (%s)' % (self._site._current, self._site._pages[self._site._current]._url))
+        try:
+            action.data['find'](self._driver).click()
+        except Exception as e:
+            logging.warning('error clicking ' + str(e))
+            raise
+        self.teardown('click', action.connection)
 
     def study_state(self):
         page = self._site.current_page(self._driver.page_source, self._driver.current_url)
@@ -72,4 +87,5 @@ class Browser:
             links = []
         for link in links:
             logging.debug('%s %s %s' % (link.tag_name, link.get_attribute('href'), link.get_attribute('id')))
-            page.add_interest({'type': 'link', 'obj': link, 'target': link.get_attribute('href')})
+            self._site.add_link(link.get_attribute('href'))
+        self._site.update_current_page(page)

@@ -15,9 +15,10 @@ class Page:
         self._calls = []
 
     def __repr__(self):
-        return "<Page ('%s')" % (self._id)
+        return "<Page ('%s', '%s')" % (self._url, self._id)
 
     def add_interest(self, interest):
+        interest['explored'] = False
         self._interests.append(interest)
 
     def add_call(self, call):
