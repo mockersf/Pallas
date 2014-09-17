@@ -5,9 +5,6 @@ from Main.Browser import Browser
 from Site.Site import Site
 
 
-config = Configuration()
-logging.basicConfig(format='%(asctime)s [%(levelname)s] %(message)s', level=config.get_log_level())
-
 
 def check_website(url):
     config = Configuration()
@@ -33,3 +30,6 @@ def check_website(url):
 
 if __name__ == '__main__':
     check_website(config.target)
+    config = Configuration()
+    logging.basicConfig(format='%(asctime)s [%(levelname)s] %(message)s', level=config.get_log_level())
+
