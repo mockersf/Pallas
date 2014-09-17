@@ -174,4 +174,3 @@ class Test_Site_Site(object):
         assert site._connections[connection_6_id]['to'] == hashlib.md5(html.encode('utf-8')).hexdigest()
         actions = site.get_first_connection_unexplored()
         assert actions == None
-        
