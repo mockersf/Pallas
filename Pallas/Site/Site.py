@@ -18,6 +18,7 @@ class Site:
 
     class ConnecionTypes:
         LINK = "link"
+        START = "start"
         FORM = "form"
 
     def __init__(self, url):
@@ -38,17 +39,13 @@ class Site:
 
     def current_page(self, html_source, url, connection_id=None):
         uniq_page = hashlib.md5(html_source.encode('utf-8')).hexdigest()
-        if self._current is not None:
-            if connection_id is not None:
-                connections = [id for id, connection in self._connections.items() if connection['from'] == self._current and id == connection_id]
-                if len(connections) == 1:
-                    self._connections[connections[0]]['explored'] = True
-                    self._connections[connections[0]]['to'] = uniq_page
-            else:
-                connections = [id for id, connection in self._connections.items() if connection['from'] == self._current and connection['type'] == self.ConnecionTypes.LINK and connection['data']['url'] == url]
-                if len(connections) == 1:
-                    self._connections[connections[0]]['explored'] = True
-                    self._connections[connections[0]]['to'] = uniq_page
+        if connection_id is not None:
+            connections = [id for id, connection in self._connections.items() if connection['from'] == self._current and id == connection_id]
+            if len(connections) == 1:
+                self._connections[connections[0]]['explored'] = True
+                self._connections[connections[0]]['to'] = uniq_page
+        else:
+            self._connections[uuid.uuid4()] = {'from': "start", 'to': uniq_page, 'explored': True, 'type': self.ConnecionTypes.START, 'data': {'url': url}}
         if uniq_page not in self._pages:
             self._pages[uniq_page] = Page(url)
         self._current = uniq_page
@@ -99,7 +96,13 @@ class Site:
     def update_current_page(self, page):
         self._pages[self._current] = page
 
+    def get_current_page(self):
+        return self._pages[self._current]
+
     def show_graph(self):
+        logging.info("start")
+        for id in [id for id in self._connections if self._connections[id]['from'] == "start"]:
+            logging.info("'%s' -> '%s'" % (id, self._connections[id]))
         for page in self._pages:
             logging.info("'%s' -> '%s'" % (page, self._pages[page]))
             for id in [id for id in self._connections if self._connections[id]['from'] == page]:

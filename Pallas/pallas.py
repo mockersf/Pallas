@@ -29,7 +29,7 @@ def check_website(url):
     browser.stop()
 
 if __name__ == '__main__':
-    check_website(config.target)
     config = Configuration()
     logging.basicConfig(format='%(asctime)s [%(levelname)s] %(message)s', level=config.get_log_level())
+    check_website(config.target)
 

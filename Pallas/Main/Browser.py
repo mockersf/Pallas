@@ -73,7 +73,7 @@ class Browser:
         self.teardown('click', action.connection)
 
     def study_state(self):
-        page = self._site.current_page(self._driver.page_source, self._driver.current_url)
+        page = self._site.get_current_page()
         try:
             elems = self._driver.find_elements_by_tag_name("input")
         except:
