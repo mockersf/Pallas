@@ -25,7 +25,9 @@ class Test_Main_Configuration(object):
         from Main.Configuration import Configuration
         target_url = str(uuid.uuid4())
         path = str(uuid.uuid4())
-        config = Configuration(['-v', 'FATAL', '--target', target_url, '--proxy-path', path])
-        assert config.get_log_level() == logging.FATAL
-        assert config.target == target_url
-        assert config.proxy_path == path
+        for level in [{'DEBUG': 10}, {'INFO': 20}, {'WARNING': 30}, {'ERROR': 40}, {'CRITICAL': 50}, {'FATAL': 50}, {'NOTHING': 50}]:
+            config = Configuration(['-v', list(level.keys())[0], '--target', target_url, '--proxy-path', path])
+            assert config.log_level == list(level.keys())[0]
+            assert config.get_log_level() == level[list(level.keys())[0]]
+            assert config.target == target_url
+            assert config.proxy_path == path

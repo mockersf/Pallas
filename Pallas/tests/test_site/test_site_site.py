@@ -105,6 +105,7 @@ class Test_Site_Site(object):
         site.update_current_page(page3_content)
         assert site._pages[page1_id] == page3_content
         assert site._pages[page2_id] == page2_content
+        assert site.get_current_page() == page3_content
 
     def test_on_path_finding(self):
         from Site.Site import Site
