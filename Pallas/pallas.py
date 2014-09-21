@@ -3,6 +3,7 @@ import logging
 from Main.Configuration import Configuration
 from Main.Browser import Browser
 from Site.Site import Site
+from Handler.Handler import app
 
 
 
@@ -31,5 +32,7 @@ def check_website(url):
 if __name__ == '__main__':
     config = Configuration()
     logging.basicConfig(format='%(asctime)s [%(levelname)s] %(message)s', level=config.get_log_level())
-    check_website(config.target)
-
+    if config.auto:
+        check_website(config.target)
+    else:
+        app.run(host="0.0.0.0")
