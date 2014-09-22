@@ -6,6 +6,9 @@ VAGRANTFILE_API_VERSION = "2"
 Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   config.vm.box = "hashicorp/precise32"
   config.vm.synced_folder "../../Pallas", "/Pallas"
+
+  config.vm.network "forwarded_port", guest: 7337, host: 7337
+  config.vm.network "forwarded_port", guest: 5000, host: 5000
   
   config.vm.provision "puppet" do |puppet|
     puppet.manifests_path = 'puppet/manifests'
