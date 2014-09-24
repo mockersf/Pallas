@@ -1,26 +1,31 @@
 <!doctype html>
-<title>Pallas</title>
-{% with messages = get_flashed_messages() %}
-  {% if messages %}
-    <ul class=flashes>
-    {% for message in messages %}
-      <li>{{ message }}</li>
-    {% endfor %}
-    </ul>
-  {% endif %}
-{% endwith %}
-<form method=post action="/">
-  <dl>
-	  <dt>{{ form.target.label }}
-	  <dd>{{ form.target|safe }}
-	  {% if form.target.errors %}
-	    <ul class=errors>
-	    {% for error in form.target.errors %}
-	      <li>{{ error }}</li>
-	    {% endfor %}
-	    </ul>
-	  {% endif %}
-	  </dd>
-  </dl>
-  <p><input type=submit value=Analyze>
-</form>
+<html>
+	<head>
+		<title>Pallas</title>
+	</head>
+	<body>
+		{% with messages = get_flashed_messages() %}
+		  {% if messages %}
+		    <ul class=flashes>
+		    {% for message in messages %}
+		      <li>{{ message }}</li>
+		    {% endfor %}
+		    </ul>
+		  {% endif %}
+		{% endwith %}
+		<form method=post action="/">
+			{{ form.target.label }}
+			{{ form.target|safe }}
+			  {% if form.target.errors %}
+			    <ul class=errors>
+			    {% for error in form.target.errors %}
+			      <li>{{ error }}</li>
+			    {% endfor %}
+			    </ul>
+			  {% endif %}
+			{{ form.browser.label }}
+			{{ form.browser|safe }}
+			<input type=submit value=Analyze>
+		</form>
+	</body>
+</html>
