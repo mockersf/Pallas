@@ -27,6 +27,7 @@ def check_website(url):
         browser.study_state()
         actions = site.get_first_connection_unexplored()
     site.show_graph()
+    site.get_gexf()
     browser.stop()
 
 if __name__ == '__main__':

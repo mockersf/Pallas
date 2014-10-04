@@ -20,36 +20,39 @@ class Browser:
 
     def start(self, site):
         config = Configuration()
-        browsermobproxy_bin = "" if config.proxy_path is None else config.proxy_path
-        self._proxy_server = browsermobproxy.Server(browsermobproxy_bin + "browsermob-proxy")
-        self._proxy_server.start()
-        self._proxy_client = self._proxy_server.create_proxy()
-        profile = webdriver.FirefoxProfile()
-        profile.set_proxy(self._proxy_client.selenium_proxy())
-        self._driver = webdriver.Firefox(firefox_profile=profile)
+        #browsermobproxy_bin = "" if config.proxy_path is None else config.proxy_path
+        #self._proxy_server = browsermobproxy.Server(browsermobproxy_bin + "browsermob-proxy")
+        #self._proxy_server.start()
+        #self._proxy_client = self._proxy_server.create_proxy()
+        #profile = webdriver.FirefoxProfile()
+        #profile.set_proxy(self._proxy_client.selenium_proxy())
+        #self._driver = webdriver.Firefox(firefox_profile=profile)
+        self._driver = webdriver.PhantomJS()
         self._site = site
 
     def stop(self):
-        self._proxy_server.stop()
+        #self._proxy_server.stop()
         self._driver.quit()
 
     def add_remap_urls(self, urls):
-        import socket
-        for url in urls:
-            self._proxy_client.remap_hosts(url, socket.gethostbyname(url))
+        pass
+        #import socket
+        #for url in urls:
+        #    self._proxy_client.remap_hosts(url, socket.gethostbyname(url))
 
     def setup(self, query):
-        self._proxy_client.new_har(query)
+        pass
+        #self._proxy_client.new_har(query)
 
     def teardown(self, query, connection_id=None):
         logging.debug('browser is ready')
-        self._proxy_client.wait_for_traffic_to_stop(1000, 5000)
+        #self._proxy_client.wait_for_traffic_to_stop(1000, 5000)
         logging.debug('no query ran for 1 second !')
         page = self._site.current_page(self._driver.page_source, self._driver.current_url, connection_id)
-        for entry in self._proxy_client.har['log']['entries']:
-            logging.debug("%-4s %s - %s" %
-                          (entry['request']['method'], entry['request']['url'], entry['response']['status']))
-            page.add_call(entry)
+        #for entry in self._proxy_client.har['log']['entries']:
+        #    logging.debug("%-4s %s - %s" %
+        #                  (entry['request']['method'], entry['request']['url'], entry['response']['status']))
+        #    page.add_call(entry)
 
     def get(self, url=None):
         self.setup('get')

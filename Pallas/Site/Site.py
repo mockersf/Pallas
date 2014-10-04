@@ -19,7 +19,7 @@ class Site:
     _connections = None
     _current = None
 
-    class ConnecionTypes:
+    class ConnectionTypes:
         LINK = "link"
         START = "start"
         FORM = "form"
@@ -48,16 +48,16 @@ class Site:
                 self._connections[connections[0]]['explored'] = True
                 self._connections[connections[0]]['to'] = uniq_page
         else:
-            self._connections[uuid.uuid4()] = {'from': "start", 'to': uniq_page, 'explored': True, 'type': self.ConnecionTypes.START, 'data': {'url': url}}
+            self._connections[uuid.uuid4()] = {'from': "start", 'to': uniq_page, 'explored': True, 'type': self.ConnectionTypes.START, 'data': {'url': url}}
         if uniq_page not in self._pages:
             self._pages[uniq_page] = Page(url)
         self._current = uniq_page
         return self._pages[uniq_page]
 
     def add_link(self, url):
-        connections = [connection for connection in list(self._connections.values()) if connection['from'] == self._current and connection['type'] == self.ConnecionTypes.LINK and connection['data']['url'] == url]
+        connections = [connection for connection in list(self._connections.values()) if connection['from'] == self._current and connection['type'] == self.ConnectionTypes.LINK and connection['data']['url'] == url]
         if len(connections) == 0:
-            self._connections[uuid.uuid4()] = {'from': self._current, 'to': None, 'explored': False, 'type': self.ConnecionTypes.LINK, 'data': {'url': url}}
+            self._connections[uuid.uuid4()] = {'from': self._current, 'to': None, 'explored': False, 'type': self.ConnectionTypes.LINK, 'data': {'url': url}}
 
     def get_distance_to(self, connection_uuid):
         return len(self.get_actions_to(self._connections[connection_uuid]['from']))
@@ -86,11 +86,11 @@ class Site:
         return shortest
 
     def get_first_connection_unexplored(self):
-        links = [{'id': id, 'connection': elem} for id, elem in self._connections.items() if elem['from'] == self._current and not elem['explored'] and elem['type'] == self.ConnecionTypes.LINK]
+        links = [{'id': id, 'connection': elem} for id, elem in self._connections.items() if elem['from'] == self._current and not elem['explored'] and elem['type'] == self.ConnectionTypes.LINK]
         if len(links) > 0:
             return [self.get_action(links[0])]
         else:
-            links = [{'id': id, 'connection':elem, 'dist': self.get_distance_to(id)} for id, elem in self._connections.items() if not elem['explored'] and elem['type'] == self.ConnecionTypes.LINK]
+            links = [{'id': id, 'connection':elem, 'dist': self.get_distance_to(id)} for id, elem in self._connections.items() if not elem['explored'] and elem['type'] == self.ConnectionTypes.LINK]
             if len(links) > 0:
                 links = sorted(links, key=lambda item: item['dist'])
                 return self.get_actions_to(links[0]['connection']['from']) + [self.get_action(links[0])]
@@ -110,3 +110,17 @@ class Site:
             logging.info("'%s' -> '%s'" % (page, self._pages[page]))
             for id in [id for id in self._connections if self._connections[id]['from'] == page]:
                 logging.info("'%s' -> '%s'" % (id, self._connections[id]))
+
+    def get_gexf(self):
+        from gexf import Gexf
+        gexf = Gexf("Pallas", self.url)
+        graph = gexf.addGraph("directed", "static", "Current site exploration")
+        graph.addNode('start', 'start')
+        for page in self._pages:
+          graph.addNode(page, self._pages[page]._url)
+        for id in [id for id in self._connections if self._connections[id]['from'] == "start"]:
+          graph.addEdge(id, "start", self._connections[id]['to'])
+        for page in self._pages:
+            for id in [id for id in self._connections if self._connections[id]['from'] == page]:
+              graph.addEdge(id, self._connections[id]['from'], self._connections[id]['to'])
+        return gexf.getXML()
