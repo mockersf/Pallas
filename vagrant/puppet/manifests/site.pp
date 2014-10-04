@@ -14,4 +14,4 @@ File {
     mode => '0644',
 }
 
-include baseconfig, apache, apache_vhosts, browsermob_proxy, python-modules, firefox
+include baseconfig, apache, apache_vhosts, browsermob_proxy, python-modules, firefox, phantomjs
