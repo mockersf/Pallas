@@ -1,15 +1,27 @@
-from wtforms import Form, TextField, SelectField, validators
-from flask import Flask, render_template, flash, request
+import os
+import json
+
+from flask import Flask, send_from_directory, jsonify, request
+
+from Main.Configuration import Configuration
+
 app = Flask(__name__)
-app.secret_key = 'why would I tell you my secret key?'
 
-class TargetSiteForm(Form):
-    target = TextField('target', [validators.Length(min=4, max=250)])
-    browser = SelectField('browser', choices=[('phantom', 'phantomJS'), ('ff', 'Firefox'), ('chrome', 'Chrome'), ('ie', 'Internet Explorer')])
+@app.route('/')
+def home():
+    return send_file('index.html')
 
-@app.route('/', methods=['GET', 'POST'])
-def hello():
-    form = TargetSiteForm(request.form)
-    if request.method == 'POST' and form.validate():
-        flash('going to analyse %s with %s' % (form.target.data , form.browser.data))
-    return render_template('index.html', form=form)
+@app.route('/start', methods=['POST'])
+def start():
+    tt = request.get_json()
+    return json.dumps(tt)
+
+@app.route('/default-target.json')
+def default_target():
+    config = Configuration()
+    return jsonify(url=config.target, browser=None)
+
+@app.route('/s/<path:filename>')
+def send_file(filename):
+    rootdir = os.path.abspath(os.path.dirname(__file__))
+    return send_from_directory(os.path.join(rootdir, 'ui'), filename)

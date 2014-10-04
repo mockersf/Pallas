@@ -9,7 +9,10 @@ import uuid
 from .Page import Page
 from Main.Action import Action
 
+from Main.singleton import singleton
 
+
+@singleton
 class Site:
     _url = None
     _pages = None
