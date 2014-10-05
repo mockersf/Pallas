@@ -20,6 +20,17 @@
     }
     return hasPathTo;
   });
+  sigma.classes.graph.addMethod('isPathFrom', function(nodeId) {
+    var k
+    var isPathFrom = {}
+    edges = this.edges()
+    for (k in edges) {
+      e = edges[k]
+      if (e.source === nodeId)
+        isPathFrom[e.id] = e;
+    }
+    return isPathFrom;
+  });
 
   var g = {
     nodes: [],
@@ -42,18 +53,40 @@
   sigma.plugins.dragNodes(s, s.renderers[0]);
   s.bind('clickNode', function(e) {
     var nodeId = e.data.node.id;
-    var toColor = s.graph.hasPathTo(nodeId);
-    toColor[nodeId] = e.data.node;
+    var nodesToColor = s.graph.hasPathTo(nodeId);
+    nodesToColor[nodeId] = e.data.node;
+    var edgesToColor = s.graph.isPathFrom(nodeId);
+    if (last_node_click === nodeId) {
+      nodesToColor = {};
+      edgesToColor = {};
+      last_node_click = undefined;
+    } else last_node_click = nodeId;
 
     s.graph.nodes().forEach(function(n) {
-      if (toColor[n.id])
-        n.color = '#0f0';
+      if (nodesToColor[n.id]) {
+        if (n.id === nodeId) {
+          n.color = "#00F";
+        } else {
+          n.color = '#0F0';
+        }
+      }
       else
-        n.color = '#666';
+        n.color = n.color_origin;
+
     });
+
+    s.graph.edges().forEach(function(n) {
+      if (edgesToColor[n.id])
+        n.color = '#0F0';
+      else
+        n.color = n.color_origin;
+    });
+
     s.refresh();
   });
 })()
+
+var last_node_click;
 
 function placeNodes() {
   var i;
@@ -64,11 +97,17 @@ function placeNodes() {
       nodes[i].x = Math.random();
       nodes[i].y = Math.random();
       nodes[i].size = s.graph.degree(nodes[i].id);
-      nodes[i].color = '#666';
+      if (nodes[i].label == 'start')
+          nodes[i].color = '#F00'
+      else
+          nodes[i].color = '#666';
+      nodes[i].color_origin = nodes[i].color;
   }
   len = edges.length;
   for (i = 0; i < len; i++) {
       edges[i].type = 'curvedArrow';
+      edges[i].color = '#666';
+      edges[i].color_origin = edges[i].color;
   }
   s.refresh();
   s.startForceAtlas2();
