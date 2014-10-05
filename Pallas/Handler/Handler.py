@@ -18,6 +18,11 @@ def home():
 @app.route('/start', methods=['POST'])
 def start():
     starter = request.get_json()
+    Configuration().browser = starter['browser']
+    if starter['proxy'] == 'no proxy':
+        Configuration().proxy_path = None
+    else:
+        Configuration().proxy_path = starter['proxy_path']
     site = Site(starter['url'])
     browser = Browser()
     browser.start(site)
@@ -40,7 +45,7 @@ def start():
 @app.route('/default-target.json')
 def default_target():
     config = Configuration()
-    return jsonify(url=config.target, browser=None)
+    return jsonify(url=config.target, browser=config.browser, proxy=config.proxy_path)
 
 @app.route('/s/<path:filename>')
 def send_file(filename):

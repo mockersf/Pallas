@@ -14,45 +14,59 @@ class Browser:
     _proxy_server = None
     _proxy_client = None
     _site = None
+    _config = None
 
     def __init__(self):
-        pass
+        self._config = Configuration()
 
     def start(self, site):
-        config = Configuration()
-        #browsermobproxy_bin = "" if config.proxy_path is None else config.proxy_path
-        #self._proxy_server = browsermobproxy.Server(browsermobproxy_bin + "browsermob-proxy")
-        #self._proxy_server.start()
-        #self._proxy_client = self._proxy_server.create_proxy()
-        #profile = webdriver.FirefoxProfile()
-        #profile.set_proxy(self._proxy_client.selenium_proxy())
-        #self._driver = webdriver.Firefox(firefox_profile=profile)
-        self._driver = webdriver.PhantomJS()
+        if self._config.proxy_path is not None:
+            browsermobproxy_bin = "" if self._config.proxy_path is None else self._config.proxy_path
+            self._proxy_server = browsermobproxy.Server(browsermobproxy_bin + "browsermob-proxy")
+            self._proxy_server.start()
+            self._proxy_client = self._proxy_server.create_proxy()
+        if self._config.browser == 'Firefox':
+            profile = webdriver.FirefoxProfile()
+            if self._config.proxy_path is not None:
+                profile.set_proxy(self._proxy_client.selenium_proxy())
+            self._driver = webdriver.Firefox(firefox_profile=profile)
+        if self._config.browser == 'PhantomJS':
+            if self._config.proxy_path is not None:
+                service_args = [
+                  '--proxy=%s' % self._proxy_client.selenium_proxy().httpProxy,
+                  '--proxy-type=http',
+                  ]
+            else:
+                service_args = []
+            self._driver = webdriver.PhantomJS(service_args=service_args)
         self._site = site
 
     def stop(self):
-        #self._proxy_server.stop()
+        if self._config.proxy_path is not None:
+            self._proxy_server.stop()
         self._driver.quit()
 
     def add_remap_urls(self, urls):
-        pass
-        #import socket
-        #for url in urls:
-        #    self._proxy_client.remap_hosts(url, socket.gethostbyname(url))
+        if self._config.proxy_path is not None:
+            import socket
+            for url in urls:
+                self._proxy_client.remap_hosts(url, socket.gethostbyname(url))
 
     def setup(self, query):
-        pass
-        #self._proxy_client.new_har(query)
+        if self._config.proxy_path is not None:
+            self._proxy_client.new_har(query)
 
     def teardown(self, query, connection_id=None):
         logging.debug('browser is ready')
-        #self._proxy_client.wait_for_traffic_to_stop(1000, 5000)
-        logging.debug('no query ran for 1 second !')
+        if self._config.proxy_path is not None:
+            self._proxy_client.wait_for_traffic_to_stop(1000, 5000)
+            logging.debug('no query ran for 1 second !')
         page = self._site.current_page(self._driver.page_source, self._driver.current_url, connection_id)
-        #for entry in self._proxy_client.har['log']['entries']:
-        #    logging.debug("%-4s %s - %s" %
-        #                  (entry['request']['method'], entry['request']['url'], entry['response']['status']))
-        #    page.add_call(entry)
+        if self._config.proxy_path is not None:
+            for entry in self._proxy_client.har['log']['entries']:
+                logging.debug("%-4s %s - %s" %
+                              (entry['request']['method'], entry['request']['url'], entry['response']['status']))
+                page.add_call(entry)
 
     def get(self, url=None):
         self.setup('get')

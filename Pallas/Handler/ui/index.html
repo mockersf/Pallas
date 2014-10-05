@@ -14,6 +14,9 @@
 			<input type="text" ng-model="target.url" placeholder="http://example.com/">
 			<select ng-model="target.browser" ng-options="browser for browser in target.browsers" title="browser">
 			</select>
+			<select ng-model="target.proxy" ng-options="proxy for proxy in ['no proxy', 'browsermob']" title="proxy">
+			</select>
+			<input type="text" ng-model="target.proxy_path" placeholder="/path/to/browsermob-proxy" ng-show="target.proxy=='browsermob'">
 			<input type="submit" value="Analyze">
 		</form>
 		<div id="container">
