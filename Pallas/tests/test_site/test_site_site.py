@@ -2,6 +2,7 @@ import os.path
 import sys
 import uuid
 import hashlib
+from lxml import etree
 
 def setup_module(module):
     sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..')))
@@ -117,12 +118,16 @@ class Test_Site_Site(object):
 
     def test_on_path_finding(self):
         from Site.Site import Site
+        from Site.Page import Page
         from Main.Action import Action
-        site = Site("http://%s.url/for/page" % uuid.uuid4())
+        site_url = "http://%s.url/for/page" % uuid.uuid4()
+        site = Site(site_url)
         node_start = str(uuid.uuid4())
         node_1 = str(uuid.uuid4())
         node_2 = str(uuid.uuid4())
         node_end = str(uuid.uuid4())
+        connection_0_id = str(uuid.uuid4())
+        connection_0_content = {'from': 'start', 'to': node_start, 'explored': True, 'type': site.ConnectionTypes.START, 'data': {'url': site_url}}
         connection_1_id = str(uuid.uuid4())
         connection_1_url = str(uuid.uuid4())
         connection_1_content = {'from': node_start, 'to': node_1, 'explored': True, 'type': site.ConnectionTypes.LINK, 'data': {'url': connection_1_url}}
@@ -141,12 +146,17 @@ class Test_Site_Site(object):
         connection_6_id = str(uuid.uuid4())
         connection_6_url = str(uuid.uuid4())
         connection_6_content = {'from': node_end, 'to': None, 'explored': False, 'type': site.ConnectionTypes.LINK, 'data': {'url': connection_6_url}}
+        site._connections[connection_0_id] = connection_0_content
         site._connections[connection_1_id] = connection_1_content
         site._connections[connection_2_id] = connection_2_content
         site._connections[connection_3_id] = connection_3_content
         site._connections[connection_4_id] = connection_4_content
         site._connections[connection_5_id] = connection_5_content
         site._connections[connection_6_id] = connection_6_content
+        site._pages[node_start] = Page('node_start')
+        site._pages[node_1] = Page('node_1')
+        site._pages[node_2] = Page('node_2')
+        site._pages[node_end] = Page('node_end')
         site._current = node_start
         path = site.find_shortest_path(node_start, node_end)
         assert path[0] == {'connection': {'from': node_start, 'to': node_2, 'explored': True, 'type': site.ConnectionTypes.LINK, 'data': {'url': connection_5_url}}, 'id': connection_5_id}
@@ -177,9 +187,16 @@ class Test_Site_Site(object):
         assert actions[0]._type == Action.ActionType.CLICK
         assert actions[0].connection == connection_6_id
         assert actions[0].data['xpath'] == "//a[contains(@href, '%s')]" % connection_6_url
-        html = str('<html><body><div>test</div></body></html>')
+        html = str('<html><body><div>new_page</div></body></html>')
         page = site.current_page(html, '', connection_6_id)
+        assert site._pages[site.get_uniq_id(html, '')] == page
         assert site._connections[connection_6_id]['explored'] == True
-        assert site._connections[connection_6_id]['to'] == hashlib.md5(html.encode('utf-8')).hexdigest()
+        assert site._connections[connection_6_id]['to'] == site.get_uniq_id(html, '')
         actions = site.get_first_connection_unexplored()
         assert actions == None
+        gexf = etree.Element('test')
+        gexf_site = site.get_gexf()
+        assert gexf_site.xpath('//meta/creator')[0].text == "Pallas"
+        assert gexf_site.xpath('//meta/description')[0].text == site_url
+        assert len(gexf_site.xpath('//nodes/node')) == 6
+        assert len(gexf_site.xpath('//edges/edge')) == 7

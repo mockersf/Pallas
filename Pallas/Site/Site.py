@@ -40,8 +40,11 @@ class Site:
     def hostname(self):
         return urlparse(self._url).hostname
 
+    def get_uniq_id(self, html_source, url):
+        return hashlib.md5(html_source.encode('utf-8')).hexdigest()
+
     def current_page(self, html_source, url, connection_id=None):
-        uniq_page = hashlib.md5(html_source.encode('utf-8')).hexdigest()
+        uniq_page = self.get_uniq_id(html_source, url)
         if connection_id is not None:
             connections = [id for id, connection in self._connections.items() if connection['from'] == self._current and id == connection_id]
             if len(connections) == 1:
@@ -90,7 +93,11 @@ class Site:
         if len(links) > 0:
             return [self.get_action(links[0])]
         else:
-            links = [{'id': id, 'connection':elem, 'dist': self.get_distance_to(id)} for id, elem in self._connections.items() if not elem['explored'] and elem['type'] == self.ConnectionTypes.LINK]
+            try:
+                links = [{'id': id, 'connection':elem, 'dist': self.get_distance_to(id)} for id, elem in self._connections.items() if not elem['explored'] and elem['type'] == self.ConnectionTypes.LINK]
+            except TypeError:
+                logging.info("Dead end on page '%s'" % (self._current))
+                return None
             if len(links) > 0:
                 links = sorted(links, key=lambda item: item['dist'])
                 return self.get_actions_to(links[0]['connection']['from']) + [self.get_action(links[0])]

@@ -40,3 +40,6 @@ class Test_Main_singleton(object):
         assert t1.value != t3.value
         t4 = Test(7)
         assert t3.value == t4.value
+        #re-initializing a singleton with a value already used still create a new instance
+        t5 = Test(3)
+        assert t1.value != t5.value

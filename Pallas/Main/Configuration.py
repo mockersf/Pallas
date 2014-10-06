@@ -19,7 +19,9 @@ class Configuration(object):
 
         self._log_level = cli_args.log_level
         self._target = cli_args.target
-        self._browser = cli_args.browser
+        self._browser = 'PhantomJS'
+        if cli_args.browser in ['PhantomJS', 'Firefox']:
+            self._browser = cli_args.browser
         self._proxy_path = cli_args.proxy_path
         self._auto = cli_args.auto
 

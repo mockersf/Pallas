@@ -6,7 +6,7 @@ from selenium import webdriver
 from Main.singleton import singleton
 from Main.Configuration import Configuration
 from Site.Page import Page
-
+from tests.DummyBrowser import DummyBrowser
 
 @singleton
 class Browser:
@@ -39,6 +39,8 @@ class Browser:
             else:
                 service_args = []
             self._driver = webdriver.PhantomJS(service_args=service_args)
+        if self._config.browser == 'Dummy':
+            self._driver = DummyBrowser()
         self._site = site
 
     def stop(self):
