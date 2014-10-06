@@ -1,2 +1,2 @@
 [run]
-omit = Pallas/tests/*
+omit = Pallas/tests/*,Pallas/browsermobproxy/*
