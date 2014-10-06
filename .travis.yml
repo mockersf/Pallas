@@ -10,5 +10,5 @@ install:
   - git clone https://github.com/AutomatedTester/browsermob-proxy-py.git
   - python browsermob-proxy-py/setup.py install
 script:
-  - py.test --cov-report term-missing --cov Pallas
+  - py.test --cov-report term-missing --cov Pallas Pallas
 after_success: coveralls
