@@ -53,16 +53,19 @@
   sigma.plugins.dragNodes(s, s.renderers[0]);
   s.bind('clickNode', function(e) {
     var nodeId = e.data.node.id;
-    scp = angular.element(document.getElementById("details")).scope();
-    scp.$apply(scp.set_node(e.data.node.id))
     var nodesToColor = s.graph.hasPathTo(nodeId);
     nodesToColor[nodeId] = e.data.node;
     var edgesToColor = s.graph.isPathFrom(nodeId);
+    scp = angular.element(document.getElementById("details")).scope();
     if (last_node_click === nodeId) {
       nodesToColor = {};
       edgesToColor = {};
       last_node_click = undefined;
-    } else last_node_click = nodeId;
+      scp.$apply(scp.set_node(""))
+    } else {
+      last_node_click = nodeId;
+      scp.$apply(scp.set_node(nodeId))
+    }
 
     s.graph.nodes().forEach(function(n) {
       if (nodesToColor[n.id]) {
