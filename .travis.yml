@@ -8,6 +8,8 @@ install:
   - pip install -r pip_requirements.txt
   - git clone https://github.com/AutomatedTester/browsermob-proxy-py.git
   - mv browsermob-proxy-py/browsermobproxy Pallas/ 
+  - git clone https://github.com/Fiedzia/pygexf.git
+  - mv pygexf/gexf Pallas/
 script:
   - py.test --cov-report term-missing --cov Pallas Pallas
 after_success: coveralls

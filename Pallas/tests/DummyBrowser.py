@@ -38,6 +38,10 @@ class DummyBrowser(object):
         returns = random.randint(int(self.entropy/10), int(self.entropy/10) + 3)
         self.actions.append({'action': 'find_elements_by_tag_name', 'target': tag, 'nb': returns})
         elems = []
+        try:
+            xrange
+        except NameError:
+            xrange = range
         for i in xrange(returns):
             elems.append(DummyElement(tag))
         return elems
