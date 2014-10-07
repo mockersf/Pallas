@@ -53,6 +53,8 @@
   sigma.plugins.dragNodes(s, s.renderers[0]);
   s.bind('clickNode', function(e) {
     var nodeId = e.data.node.id;
+    scp = angular.element(document.getElementById("details")).scope();
+    scp.$apply(scp.set_node(e.data.node.id))
     var nodesToColor = s.graph.hasPathTo(nodeId);
     nodesToColor[nodeId] = e.data.node;
     var edgesToColor = s.graph.isPathFrom(nodeId);

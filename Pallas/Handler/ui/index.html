@@ -9,27 +9,30 @@
 		<script type="text/javascript" src='s/sigma.layout.forceAtlas2.min.js'></script>
 		<script type="text/javascript" src='s/sigma.plugins.dragNodes.min.js'></script>
 	</head>
-	<body ng-app="target">
-		<form method=post ng-controller="targetController as target" ng-submit="target.start()">
-			<input type="text" ng-model="target.url" placeholder="http://example.com/">
-			<select ng-model="target.browser" ng-options="browser for browser in target.browsers" title="browser">
-			</select>
-			<select ng-model="target.proxy" ng-options="proxy for proxy in ['no proxy', 'browsermob']" title="proxy">
-			</select>
-			<input type="text" ng-model="target.proxy_path" placeholder="/path/to/browsermob-proxy" ng-show="target.proxy=='browsermob'">
-			<input type="submit" value="Analyze">
-		</form>
-		<div id="container">
-		  <style>
-		    #graph-container {
-		      top: 30px;
-		      bottom: 0;
-		      left: 0;
-		      right: 0;
-		      position: absolute;
-		    }
-		  </style>
-		  <div id="graph-container"></div>
+	<body ng-app="target" style="background-color: grey">
+		<div style="width: 900px; margin: 0px auto 0px auto; background-color: white;">
+			<div id="intro" style="width:100%; height:30px; background-color: blue;">
+				<form method=post ng-controller="targetController as target" ng-submit="target.start()">
+					<input type="text" ng-model="target.url" placeholder="http://example.com/">
+					<select ng-model="target.browser" ng-options="browser for browser in target.browsers" title="browser">
+					</select>
+					<select ng-model="target.proxy" ng-options="proxy for proxy in ['no proxy', 'browsermob']" title="proxy">
+					</select>
+					<input type="text" ng-model="target.proxy_path" placeholder="/path/to/browsermob-proxy" ng-show="target.proxy=='browsermob'">
+					<input type="submit" value="Analyze">
+				</form>
+			</div>
+			<div id="container" style="width:100%; height:500px;">
+			  <div id="graph-container" style="height:100%; width:700px; float: left; background-color: white;"></div>
+				<div id="details" style="height:100%; width:200px; background-color: yellow; margin-left: 700px;" ng-controller="detailsController as details">
+					<div id="site-details" ng-show="site && !node">
+						{{site}}
+					</div>
+					<div id="node-details" ng-show="node">
+						details for node {{node}}
+					</div>
+				</div>
+			</div>
 		</div>
 		<script type="text/javascript" src='s/sigma-graph.js'></script>
 	</body>

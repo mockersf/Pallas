@@ -31,4 +31,13 @@
         });
     };
   }]);
+
+  app.controller('detailsController', [ '$http', '$scope', function($http, $scope){
+    $scope.site = "";
+    $scope.node = "";
+
+    $scope.set_node = function(node) {
+      $scope.node = node;
+    }
+  }]);
 })();
