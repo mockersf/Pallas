@@ -128,6 +128,6 @@ class Site:
         for id in [id for id in self._connections if self._connections[id]['from'] == "start"]:
           graph.addEdge(id, "start", self._connections[id]['to'])
         for page in self._pages:
-            for id in [id for id in self._connections if self._connections[id]['from'] == page]:
+            for id in [id for id in self._connections if self._connections[id]['from'] == page and self._connections[id]['explored']]:
               graph.addEdge(id, self._connections[id]['from'], self._connections[id]['to'])
         return gexf.getXML()
