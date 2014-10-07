@@ -40,6 +40,7 @@ def start():
         browser.study_state()
         actions = site.get_first_connection_unexplored()
     site.show_graph()
+    browser.stop()
     return etree.tostring(site.get_gexf())
 
 @app.route('/default-target.json')
