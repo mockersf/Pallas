@@ -48,6 +48,13 @@ def default_target():
     config = Configuration()
     return jsonify(url=config.target, browser=config.browser, proxy=config.proxy_path)
 
+@app.route('/details/<node>.json')
+def node_details(node):
+    config = Configuration()
+    site = Site()
+    page = site._pages[node]
+    return jsonify(url=page.url, html=page.html_source)
+
 @app.route('/s/<path:filename>')
 def send_file(filename):
     rootdir = os.path.abspath(os.path.dirname(__file__))

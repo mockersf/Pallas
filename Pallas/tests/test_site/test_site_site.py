@@ -153,10 +153,14 @@ class Test_Site_Site(object):
         site._connections[connection_4_id] = connection_4_content
         site._connections[connection_5_id] = connection_5_content
         site._connections[connection_6_id] = connection_6_content
-        site._pages[node_start] = Page('node_start')
-        site._pages[node_1] = Page('node_1')
-        site._pages[node_2] = Page('node_2')
-        site._pages[node_end] = Page('node_end')
+        html_start = '<html><body>%s</body></html>' % uuid.uuid4()
+        site._pages[node_start] = Page('node_start', html_start)
+        html_1 = '<html><body>%s</body></html>' % uuid.uuid4()
+        site._pages[node_1] = Page('node_1', html_1)
+        html_2 = '<html><body>%s</body></html>' % uuid.uuid4()
+        site._pages[node_2] = Page('node_2', html_2)
+        html_end = '<html><body>%s</body></html>' % uuid.uuid4()
+        site._pages[node_end] = Page('node_end', html_end)
         site._current = node_start
         path = site.find_shortest_path(node_start, node_end)
         assert path[0] == {'connection': {'from': node_start, 'to': node_2, 'explored': True, 'type': site.ConnectionTypes.LINK, 'data': {'url': connection_5_url}}, 'id': connection_5_id}

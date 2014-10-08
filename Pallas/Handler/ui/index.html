@@ -13,23 +13,37 @@
 		<div style="width: 900px; margin: 0px auto 0px auto; background-color: white;">
 			<div id="intro" style="width:100%; height:30px; background-color: blue;">
 				<form method=post ng-controller="targetController as target" ng-submit="target.start()">
-					<input type="text" ng-model="target.url" placeholder="http://example.com/">
-					<select ng-model="target.browser" ng-options="browser for browser in target.browsers" title="browser">
+					<input type="text" ng-model="target.url" placeholder="http://example.com/" ng-disabled="target.validated">
+					<select ng-model="target.browser" ng-options="browser for browser in target.browsers" title="browser" ng-show="!target.validated">
 					</select>
-					<select ng-model="target.proxy" ng-options="proxy for proxy in ['no proxy', 'browsermob']" title="proxy">
+					<span ng-show="target.validated">{{target.browser}}</span>
+					<select ng-model="target.proxy" ng-options="proxy for proxy in ['no proxy', 'browsermob']" title="proxy" ng-show="!target.validated">
 					</select>
-					<input type="text" ng-model="target.proxy_path" placeholder="/path/to/browsermob-proxy" ng-show="target.proxy=='browsermob'">
-					<input type="submit" value="Analyze">
+					<span ng-show="target.validated">{{target.proxy}}</span>
+					<input type="text" ng-model="target.proxy_path" placeholder="/path/to/browsermob-proxy" ng-show="target.proxy=='browsermob'" ng-disabled="target.validated">
+					<input type="submit" value="Analyze" ng-show="!target.validated">
+					<input type="submit" value="New" ng-show="target.validated">
 				</form>
 			</div>
 			<div id="container" style="width:100%; height:500px;">
 			  <div id="graph-container" style="height:100%; width:700px; float: left; background-color: white;"></div>
 				<div id="details" style="height:100%; width:200px; background-color: yellow; margin-left: 700px;" ng-controller="detailsController as details">
-					<div id="site-details" ng-show="site && !node">
-						{{site}}
+					<div id="site-details" ng-show="siteData.site_url && !node">
+						{{siteData.site_url}}
 					</div>
 					<div id="node-details" ng-show="node">
-						details for node {{node}}
+						details for node {{node_url}}
+						<div>
+							<form ng-submit="selectored()">
+								<input type="text" ng-model="css_selector">
+								<input type="submit" value="Search">
+							</form>
+						</div>
+						<ul id="selection_results">
+							<li ng-repeat="match in results">
+								{{match}}
+							</li>
+						</ul>
 					</div>
 				</div>
 			</div>

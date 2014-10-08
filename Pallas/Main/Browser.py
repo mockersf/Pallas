@@ -66,18 +66,12 @@ class Browser:
         page = self._site.current_page(self._driver.page_source, self._driver.current_url, connection_id)
         if self._config.proxy_path is not None:
             for entry in self._proxy_client.har['log']['entries']:
-                logging.debug("%-4s %s - %s" %
-                              (entry['request']['method'], entry['request']['url'], entry['response']['status']))
                 page.add_call(entry)
 
     def get(self, url=None):
         self.setup('get')
-        if url is None:
-            logging.info('going to %s' % (self._site.url))
-            self._driver.get(self._site.url)
-        else:
-            logging.info('going to %s' % (url))
-            self._driver.get(url)
+        logging.info('going to %s' % (self._site.url))
+        self._driver.get(self._site.url)
         self.teardown('get')
 
     def click(self, action):

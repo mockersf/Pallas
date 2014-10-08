@@ -53,7 +53,7 @@ class Site:
         else:
             self._connections[uuid.uuid4()] = {'from': "start", 'to': uniq_page, 'explored': True, 'type': self.ConnectionTypes.START, 'data': {'url': url}}
         if uniq_page not in self._pages:
-            self._pages[uniq_page] = Page(url)
+            self._pages[uniq_page] = Page(url, html_source)
         self._current = uniq_page
         return self._pages[uniq_page]
 
