@@ -39,8 +39,9 @@
 								<input type="submit" value="Search">
 							</form>
 						</div>
+						{{results.length}} result(s) matching
 						<ul id="selection_results">
-							<li ng-repeat="match in results">
+							<li ng-repeat="match in results track by $index">
 								{{match}}
 							</li>
 						</ul>

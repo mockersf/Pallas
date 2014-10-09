@@ -60,17 +60,23 @@
 
     $scope.set_node = function(node) {
       $scope.node = node;
+      $scope.results = [];
+      $scope.docu = null;
       if (node != "") {
         $http.get('/details/' + node + '.json').success(function(data){
           $scope.node_url = data.url;
           $scope.html_source = data.html;
-          //fill the document with html_source
+          $scope.docu = (new DOMParser()).parseFromString($scope.html_source, 'text/html');
         });
       }
     };
 
     $scope.selectored = function() {
-      $scope.results = $scope.docu.querySelectorAll($scope.css_selector);
+      var results = [].slice.call($scope.docu.querySelectorAll($scope.css_selector));
+      $scope.results = [];
+      results.forEach(function(result) {
+        $scope.results.push(result.outerHTML);
+      })
     };
   }]);
 })();
