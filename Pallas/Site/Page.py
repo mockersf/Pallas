@@ -1,8 +1,9 @@
-class Page:
+class Page(object):
     _url = None
     _title = None
     _interests = None
     _calls = None
+    _name = None
 
     def __init__(self, url, html_source):
         self._url = url
