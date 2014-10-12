@@ -73,8 +73,17 @@ class Site:
         return actions
 
     def get_action(self, connection):
-        xpath = "//a[contains(@href, '%s')]" % (connection['connection']['data']['url'][len(self._url):] if self._url in connection['connection']['data']['url'] else connection['connection']['data']['url'])
-        return Action(type=Action.ActionType.CLICK, data={'xpath' : xpath, 'find' : lambda driver: driver.find_element_by_xpath(xpath)}, connection=connection['id'])
+        return self.get_action_from_id(connection['id'])
+
+    def get_action_from_id(self, connection_id):
+        connection = self._connections[connection_id]
+        if 'url' in connection['data']:
+            xpath = "//a[contains(@href, '%s')]" % (connection['data']['url'][len(self._url):] if self._url in connection['data']['url'] else connection['data']['url'])
+            return Action(type=Action.ActionType.CLICK, data={'xpath' : xpath, 'find' : lambda driver: driver.find_element_by_xpath(xpath)}, connection=connection_id)
+        if 'css' in connection['data']:
+            css = connection['data']['css']
+            nb = connection['data']['nb']
+            return Action(type=Action.ActionType.CLICK, data={'find' : lambda driver: driver.find_elements_by_css_selector(css)[nb]}, connection=connection_id)
 
     def find_shortest_path(self, start, end, path=[]):
         if start == end:
@@ -108,6 +117,11 @@ class Site:
 
     def get_current_page(self):
         return self._pages[self._current]
+
+    def add_connection_to_current_page(self, connection_type, css, nb):
+        id = uuid.uuid4()
+        self._connections[id] = {'from': self._current, 'to': None, 'explored': False, 'type': connection_type, 'data': {'css': css, 'nb': nb}}
+        return id
 
     def show_graph(self):
         logging.info("start")

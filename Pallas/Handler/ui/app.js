@@ -74,9 +74,35 @@
     $scope.selectored = function() {
       var results = [].slice.call($scope.docu.querySelectorAll($scope.css_selector));
       $scope.results = [];
+      var i = 1;
+      var match;
       results.forEach(function(result) {
-        $scope.results.push(result.outerHTML);
+        match = {
+          name: 'match ' + i + ' for \'' + $scope.css_selector + '\'',
+          outerHTML: result.outerHTML,
+          object: result,
+        }
+        i++;
+        $scope.results.push(match);
+//        $scope.results.push(result.outerHTML);
       })
     };
+
+    $scope.selected = null;
+    $scope.view_match = function(id) {
+      $scope.selected = id;
+    };
+
+    $scope.go_to = function(id) {
+      var connection = {};
+      connection['css'] = $scope.css_selector;
+      connection['nb'] = id;
+      $http.post('/add_connection_and_go', JSON.stringify(connection))
+        .success(function(data){
+          s = sigma.instances()[0];
+          sigma.parsers.gexf(parseXml(data), s, placeNodes);
+        });
+    };
+
   }]);
 })();

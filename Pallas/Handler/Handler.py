@@ -8,6 +8,8 @@ from flask import Flask, send_from_directory, jsonify, request
 from Main.Configuration import Configuration
 from Main.Browser import Browser
 from Site.Site import Site
+from Main.Action import Action
+
 
 app = Flask(__name__)
 
@@ -31,16 +33,16 @@ def start():
     browser.add_remap_urls([site.hostname])
 
     browser.get()
-    browser.study_state()
-    actions = site.get_first_connection_unexplored()
-    while actions is not None:
-        logging.info('%s action(s) needed to reach this connection' % (len(actions)))
-        for action in actions:
-            action.do()
-        browser.study_state()
-        actions = site.get_first_connection_unexplored()
-    site.show_graph()
-    browser.stop()
+    return etree.tostring(site.get_gexf())
+
+@app.route('/add_connection_and_go', methods=['POST'])
+def add_connection_and_go():
+    connection = request.get_json()
+    logging.info('%s - %s' % (connection['css'], connection['nb']))
+    site = Site()
+    connection_id = site.add_connection_to_current_page(Action.ActionType.CLICK, connection['css'], connection['nb'])
+    action = site.get_action_from_id(connection_id)
+    action.do()
     return etree.tostring(site.get_gexf())
 
 @app.route('/default-target.json')

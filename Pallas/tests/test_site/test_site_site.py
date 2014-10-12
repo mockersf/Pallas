@@ -87,17 +87,10 @@ class Test_Site_Site(object):
         site_url = "http://%s.url/for/page" % uuid.uuid4()
         site = Site(site_url)
         url = str(uuid.uuid4())
-        id = str(uuid.uuid4())
+        id = site.add_connection_to_current_page(Action.ActionType.CLICK, "[href='%s']" % url, 0)
         action = site.get_action({'connection': {'data': {'url': url}}, 'id': id})
         assert action._type == Action.ActionType.CLICK
         assert action.connection == id
-        assert action.data['xpath'] == "//a[contains(@href, '%s')]" % url
-        url = str(uuid.uuid4())
-        id = str(uuid.uuid4())
-        action = site.get_action({'connection': {'data': {'url': site_url + url}}, 'id': id})
-        assert action._type == Action.ActionType.CLICK
-        assert action.connection == id
-        assert action.data['xpath'] == "//a[contains(@href, '%s')]" % url
 
 
     def test_update_current_page(self):
