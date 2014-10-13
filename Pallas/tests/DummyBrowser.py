@@ -46,6 +46,18 @@ class DummyBrowser(object):
             elems.append(DummyElement(tag))
         return elems
 
+    def find_elements_by_css_selector(self, css_sel):
+        returns = random.randint(int(self.entropy/10), int(self.entropy/10) + 3)
+        self.actions.append({'action': 'find_elements_by_css_selector', 'target': css_sel, 'nb': returns})
+        elems = []
+        try:
+            xrange
+        except NameError:
+            xrange = range
+        for i in xrange(returns):
+            elems.append(DummyElement('new_match_css_%s' % css_sel))
+        return elems
+
     def find_element_by_xpath(self, xpath):
         self.actions.append({'action': 'find_element_by_xpath', 'target': xpath})
         return DummyElement('new_tag_%s' % xpath)

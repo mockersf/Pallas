@@ -3,7 +3,7 @@ import json
 import logging
 
 from lxml import etree
-from flask import Flask, send_from_directory, jsonify, request
+from flask import Flask, send_from_directory, jsonify, request, abort
 
 from Main.Configuration import Configuration
 from Main.Browser import Browser
@@ -54,6 +54,8 @@ def default_target():
 def node_details(node):
     config = Configuration()
     site = Site()
+    if not node in site._pages:
+        abort(404)
     page = site._pages[node]
     return jsonify(url=page.url, html=page.html_source)
 

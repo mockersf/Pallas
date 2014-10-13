@@ -62,7 +62,7 @@ class Configuration(object):
         return self._browser
     @browser.setter
     def browser(self, value):
-        if value not in ['PhantomJS', 'Firefox']:
+        if value not in ['PhantomJS', 'Firefox', 'Dummy']:
             logging.warning('Browser not known : %s' % value)
         else:
             self._browser = value
