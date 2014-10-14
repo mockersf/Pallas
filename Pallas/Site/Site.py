@@ -37,6 +37,10 @@ class Site:
         return self._url
 
     @property
+    def current(self):
+        return self._current
+
+    @property
     def hostname(self):
         return urlparse(self._url).hostname
 
