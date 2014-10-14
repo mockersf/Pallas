@@ -23,6 +23,8 @@ class Configuration(object):
         if cli_args.browser in ['PhantomJS', 'Firefox']:
             self._browser = cli_args.browser
         self._proxy_path = cli_args.proxy_path
+        if self._proxy_path is None:
+            self._proxy_path = os.getenv('BROWSERMOB_PROXY_PATH')
         self._auto = cli_args.auto
 
     @property
