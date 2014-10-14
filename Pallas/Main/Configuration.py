@@ -16,6 +16,7 @@ class Configuration(object):
         group.add_argument("-b", "--browser", help="Browser used to explore", type=str, default="PhantomJS")
         group.add_argument("--proxy-path", help="Path to browsermob proxy executable", type=str, default=None)
         group.add_argument("--auto", help="Launch automated analysis", default=False, action='store_true')
+        group.add_argument("--env", help="Read environment variable", default=False, action='store_true')
         cli_args = cli_parser.parse_args(args)
 
         self._log_level = cli_args.log_level
@@ -24,8 +25,8 @@ class Configuration(object):
         if cli_args.browser in ['PhantomJS', 'Firefox']:
             self._browser = cli_args.browser
         self._proxy_path = cli_args.proxy_path
-        if self._proxy_path is None:
-            self._proxy_path = os.getenv('BROWSERMOB_PROXY_PATH')
+        if cli_args.env:
+            self._proxy_path = os.getenv('BROWSERMOB_PROXY_PATH', self._proxy_path)
         self._auto = cli_args.auto
 
     @property
