@@ -66,6 +66,8 @@ class Test_Site_Site(object):
         site = Site(url)
         assert site.__repr__() == ("<Site ('%s')>" % (url))
         assert site.url == url
+        assert site.current == None
+        assert site.current == site._current
 
     def test_add_link(self):
         from Site.Site import Site

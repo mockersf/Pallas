@@ -27,7 +27,7 @@ class Test_Main_Configuration(object):
         assert config.proxy_path == proxy_path
         config.browser = 'Firefox'
         assert config.browser == 'Firefox'
-        config.browser = 'Navigateur Inexistant'
+        config.browser = str(uuid.uuid4())
         assert config.browser == 'Firefox'
         config.browser = 'PhantomJS'
         assert config.browser == 'PhantomJS'

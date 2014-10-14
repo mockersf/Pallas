@@ -111,7 +111,9 @@ class Test_Handler_Handler(object):
     def test_start(self):
         from Site.Site import Site
         from Main.Configuration import Configuration
-        conf = Configuration()
+        from tests.DummyBrowser import DummyBrowser
+        dummy = DummyBrowser(random.random())
+        conf = Configuration(['-b', 'Dummy'])
         headers = [('Content-Type', 'application/json')]
         url = str(uuid.uuid4())
         proxy_path = str(uuid.uuid4())
@@ -156,8 +158,9 @@ class Test_Handler_Handler(object):
         headers.append(('Content-Length', json_data_length))
         rv = self.app.post('/add_connection_and_go', headers=headers, data=json_data)
         site = Site()
+        json_returned = json.loads(rv.data.decode('utf-8'))
         assert rv.status_code == 200
-        assert rv.data == etree.tostring(site.get_gexf())
+        assert json_returned['gexf'] == etree.tostring(site.get_gexf()).decode('utf-8')
         assert len(dummy.actions) == 3
         assert dummy.actions[0] == {'action': 'get', 'target': url}
         assert dummy.actions[1]['action'] == 'find_elements_by_css_selector'

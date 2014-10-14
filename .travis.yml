@@ -4,10 +4,14 @@ python:
   - 2.7
   - 3.3
   - 3.4
-install: 
+install:
+  - sudo apt-get install -y unzip
+  - curl -k -L -O https://s3-us-west-1.amazonaws.com/lightbody-bmp/browsermob-proxy-2.0-beta-9-bin.zip
+  - unzip browsermob-proxy-2.0-beta-9-bin.zip
+  - export BROWSERMOB_PROXY_PATH=`pwd`/browsermob-proxy-2.0-beta-9/bin/
   - pip install -r pip_requirements.txt
   - git clone https://github.com/AutomatedTester/browsermob-proxy-py.git
-  - mv browsermob-proxy-py/browsermobproxy Pallas/ 
+  - mv browsermob-proxy-py/browsermobproxy Pallas/
   - git clone https://github.com/Fiedzia/pygexf.git
   - mv pygexf/gexf Pallas/
 script:

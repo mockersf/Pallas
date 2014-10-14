@@ -23,4 +23,5 @@ class Test_pallas(object):
         dummy = DummyBrowser(random.random())
         config = Configuration(['-b', 'Dummy'])
         config._browser = 'Dummy'
-        pallas.check_website('test')
+        Browser(random.random())
+        pallas.check_website(str(uuid.uuid4()))
