@@ -16,7 +16,7 @@ class Browser:
     _site = None
     _config = None
 
-    def __init__(self):
+    def __init__(self, random=None):
         self._config = Configuration()
 
     def start(self, site):
@@ -78,26 +78,16 @@ class Browser:
         self.setup('click')
         logging.info('doing %s' % (action))
         logging.info('current page %s (%s)' % (self._site._current, self._site._pages[self._site._current]._url))
-        try:
-            action.data['find'](self._driver).click()
-        except Exception as e:
-            logging.warning('error clicking ' + str(e))
-            raise
+        action.data['find'](self._driver).click()
         self.teardown('click', action.connection)
 
     def study_state(self):
         page = self._site.get_current_page()
-        try:
-            elems = self._driver.find_elements_by_tag_name("input")
-        except:
-            elems = []
+        elems = self._driver.find_elements_by_tag_name("input")
         for elem in elems:
             logging.debug('%s %s %s' % (elem.tag_name, elem.get_attribute('type'), elem.get_attribute('id')))
             page.add_interest({'type': 'input', 'obj': elem})
-        try:
-            links = self._driver.find_elements_by_tag_name("a")
-        except:
-            links = []
+        links = self._driver.find_elements_by_tag_name("a")
         for link in links:
             logging.debug('%s %s %s' % (link.tag_name, link.get_attribute('href'), link.get_attribute('id')))
             self._site.add_link(link.get_attribute('href'))
