@@ -43,7 +43,7 @@ def add_connection_and_go():
     connection_id = site.add_connection_to_current_page(Action.ActionType.CLICK, connection['css'], connection['nb'])
     action = site.get_action_from_id(connection_id)
     action.do()
-    return etree.tostring(site.get_gexf())
+    return jsonify(gexf=etree.tostring(site.get_gexf()).decode('utf-8'), current_page=site.current)
 
 @app.route('/default-target.json')
 def default_target():

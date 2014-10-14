@@ -57,11 +57,13 @@
     $scope.docu = null;
     $scope.css_selector = "";
     $scope.results = [];
+    $scope.selected = null;
 
     $scope.set_node = function(node) {
       $scope.node = node;
       $scope.results = [];
       $scope.docu = null;
+      $scope.selected = null;
       if (node != "") {
         $http.get('/details/' + node + '.json').success(function(data){
           $scope.node_url = data.url;
@@ -74,6 +76,7 @@
     $scope.selectored = function() {
       var results = [].slice.call($scope.docu.querySelectorAll($scope.css_selector));
       $scope.results = [];
+      $scope.selected = null;
       var i = 1;
       var match;
       results.forEach(function(result) {
@@ -88,7 +91,6 @@
       })
     };
 
-    $scope.selected = null;
     $scope.view_match = function(id) {
       $scope.selected = id;
     };
@@ -100,7 +102,8 @@
       $http.post('/add_connection_and_go', JSON.stringify(connection))
         .success(function(data){
           s = sigma.instances()[0];
-          sigma.parsers.gexf(parseXml(data), s, placeNodes);
+          sigma.parsers.gexf(parseXml(data.gexf), s, placeNodes);
+          $scope.current_page = data.current_page
         });
     };
 
