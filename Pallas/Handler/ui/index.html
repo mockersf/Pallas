@@ -47,7 +47,7 @@
 									<ul>
 										<li>{{match.object.id}}</li>
 										<li>{{match.object.href}}</li>
-										<li><a href ng-click="go_to($index)">Click</a></li>
+										<li ng-show="node == siteData.current_node"><a href ng-click="go_to($index)">Click</a></li>
 									</ul>
 								</div>
 							</li>

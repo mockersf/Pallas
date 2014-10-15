@@ -123,13 +123,15 @@ class Test_Handler_Handler(object):
         headers.append(('Content-Length', json_data_length))
         rv = self.app.post('/start', headers=headers, data=json_data)
         site = Site()
+        json_returned = json.loads(rv.data.decode('utf-8'))
         assert rv.status_code == 200
+        assert json_returned['gexf'] == etree.tostring(site.get_gexf()).decode('utf-8')
+        assert json_returned['current_page'] == site.current
         assert conf.browser == 'Dummy'
         assert conf.proxy_path is None
         assert site.url == url
         assert len(site._pages) == 1
         assert site._pages[site._current].url == url
-        assert rv.data == etree.tostring(site.get_gexf())
         data = {'browser': 'Dummy', 'proxy_path': proxy_path, 'proxy': "browsermob proxy", 'url': url}
         json_data = json.dumps(data)
         json_data_length = len(json_data)
@@ -161,6 +163,7 @@ class Test_Handler_Handler(object):
         json_returned = json.loads(rv.data.decode('utf-8'))
         assert rv.status_code == 200
         assert json_returned['gexf'] == etree.tostring(site.get_gexf()).decode('utf-8')
+        assert json_returned['current_page'] == site.current
         assert len(dummy.actions) == 3
         assert dummy.actions[0] == {'action': 'get', 'target': url}
         assert dummy.actions[1]['action'] == 'find_elements_by_css_selector'

@@ -33,7 +33,7 @@ def start():
     browser.add_remap_urls([site.hostname])
 
     browser.get()
-    return etree.tostring(site.get_gexf())
+    return jsonify(gexf=etree.tostring(site.get_gexf()).decode('utf-8'), current_page=site.current)
 
 @app.route('/add_connection_and_go', methods=['POST'])
 def add_connection_and_go():

@@ -5,6 +5,7 @@
     return {
       site_url: '',
       site_name: '',
+      current_node: null,
     };
   })
 
@@ -37,7 +38,8 @@
         $http.post('/start', JSON.stringify(config))
           .success(function(data){
             s = sigma.instances()[0];
-            sigma.parsers.gexf(parseXml(data), s, placeNodes);
+            sigma.parsers.gexf(parseXml(data.gexf), s, placeNodes);
+            target.siteData.current_node = data.current_page
           });
         this.siteData.site_url = target.url;
         this.validated = true;
@@ -103,7 +105,7 @@
         .success(function(data){
           s = sigma.instances()[0];
           sigma.parsers.gexf(parseXml(data.gexf), s, placeNodes);
-          $scope.current_page = data.current_page
+          $scope.siteData.current_node = data.current_page
         });
     };
 
