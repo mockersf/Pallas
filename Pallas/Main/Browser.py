@@ -20,24 +20,21 @@ class Browser:
         self._config = Configuration()
 
     def start(self, site):
+        profile = webdriver.FirefoxProfile()
+        service_args = []
         if self._config.proxy_path is not None:
             browsermobproxy_bin = "" if self._config.proxy_path is None else self._config.proxy_path
             self._proxy_server = browsermobproxy.Server(browsermobproxy_bin + "browsermob-proxy")
             self._proxy_server.start()
             self._proxy_client = self._proxy_server.create_proxy()
+            profile.set_proxy(self._proxy_client.selenium_proxy())
+            service_args = [
+              '--proxy=%s' % self._proxy_client.selenium_proxy().httpProxy,
+              '--proxy-type=http',
+              ]
         if self._config.browser == 'Firefox':
             profile = webdriver.FirefoxProfile()
-            if self._config.proxy_path is not None:
-                profile.set_proxy(self._proxy_client.selenium_proxy())
-            self._driver = webdriver.Firefox(firefox_profile=profile)
         if self._config.browser == 'PhantomJS':
-            if self._config.proxy_path is not None:
-                service_args = [
-                  '--proxy=%s' % self._proxy_client.selenium_proxy().httpProxy,
-                  '--proxy-type=http',
-                  ]
-            else:
-                service_args = []
             self._driver = webdriver.PhantomJS(service_args=service_args)
         if self._config.browser == 'Dummy':
             self._driver = DummyBrowser()
