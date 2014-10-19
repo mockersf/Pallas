@@ -37,9 +37,9 @@
         config['proxy_path'] = target.proxy_path;
         $http.post('/start', JSON.stringify(config))
           .success(function(data){
+            target.siteData.current_node = data.current_page
             s = sigma.instances()[0];
             sigma.parsers.gexf(parseXml(data.gexf), s, placeNodes);
-            target.siteData.current_node = data.current_page
           });
         this.siteData.site_url = target.url;
         this.validated = true;
@@ -103,9 +103,9 @@
       connection['nb'] = id;
       $http.post('/add_connection_and_go', JSON.stringify(connection))
         .success(function(data){
+          $scope.siteData.current_node = data.current_page
           s = sigma.instances()[0];
           sigma.parsers.gexf(parseXml(data.gexf), s, placeNodes);
-          $scope.siteData.current_node = data.current_page
         });
     };
 

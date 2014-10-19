@@ -1,3 +1,13 @@
+var colors = {
+  default: '#666',
+  current: '#000',
+  selected: '#66D',
+  selectedCurrent: '#00F',
+  connected: '#6D6',
+  connectedCurrent: '#0F0',
+  start: '#800'
+};
+
 (function() {
   sigma.classes.graph.addMethod('neighbors', function(nodeId) {
     var k
@@ -70,19 +80,28 @@
     s.graph.nodes().forEach(function(n) {
       if (nodesToColor[n.id]) {
         if (n.id === nodeId) {
-          n.color = "#00F";
+          if (n.id == scp.siteData['current_node'])
+            n.color = colors['selectedCurrent'];
+          else
+            n.color = colors['selected'];
         } else {
-          n.color = '#0F0';
+          if (n.id == scp.siteData['current_node'])
+            n.color = colors['connectedCurrent'];
+          else
+            n.color = colors['connected'];
         }
       }
-      else
-        n.color = n.color_origin;
-
+      else {
+        if (n.id == scp.siteData['current_node'])
+          n.color = colors['current'];
+        else
+          n.color = n.color_origin;
+      }
     });
 
     s.graph.edges().forEach(function(n) {
       if (edgesToColor[n.id])
-        n.color = '#0F0';
+        n.color = colors['connected'];
       else
         n.color = n.color_origin;
     });
@@ -98,20 +117,23 @@ function placeNodes() {
   var nodes = s.graph.nodes();
   var edges = s.graph.edges();
   var len = nodes.length;
+  scp = angular.element(document.getElementById("details")).scope();
   for (i = 0; i < len; i++) {
       nodes[i].x = Math.random();
       nodes[i].y = Math.random();
       nodes[i].size = s.graph.degree(nodes[i].id);
       if (nodes[i].label == 'start')
-          nodes[i].color = '#F00'
+          nodes[i].color = colors['start']
       else
-          nodes[i].color = '#666';
+          nodes[i].color = colors['default'];
       nodes[i].color_origin = nodes[i].color;
+      if (nodes[i].id == scp.siteData['current_node'])
+          nodes[i].color = colors['current']
   }
   len = edges.length;
   for (i = 0; i < len; i++) {
       edges[i].type = 'curvedArrow';
-      edges[i].color = '#666';
+      edges[i].color = colors['default'];
       edges[i].color_origin = edges[i].color;
   }
   s.refresh();
