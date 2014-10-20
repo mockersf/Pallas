@@ -50,6 +50,15 @@
         this.validated = false;
       }
     };
+
+    this.back_to_start = function() {
+      $http.get('/back_to_start.json')
+        .success(function(data){
+          target.siteData.current_node = data.current_page
+          s = sigma.instances()[0];
+          sigma.parsers.gexf(parseXml(data.gexf), s, placeNodes);
+        });
+    };
   }]);
 
   app.controller('detailsController', [ '$http', '$scope', 'siteData', function($http, $scope, siteData){
@@ -102,6 +111,17 @@
       connection['css'] = $scope.css_selector;
       connection['nb'] = id;
       $http.post('/add_connection_and_go', JSON.stringify(connection))
+        .success(function(data){
+          $scope.siteData.current_node = data.current_page
+          s = sigma.instances()[0];
+          sigma.parsers.gexf(parseXml(data.gexf), s, placeNodes);
+        });
+    };
+
+    $scope.follow_existing_connections = function(page_id) {
+      var query = {};
+      query['target'] = page_id;
+      $http.post('/follow_existing_connections', JSON.stringify(query))
         .success(function(data){
           $scope.siteData.current_node = data.current_page
           s = sigma.instances()[0];

@@ -45,6 +45,24 @@ def add_connection_and_go():
     action.do()
     return jsonify(gexf=etree.tostring(site.get_gexf()).decode('utf-8'), current_page=site.current)
 
+@app.route('/follow_existing_connections', methods=['POST'])
+def follow_existing_connections():
+    infos = request.get_json()
+    logging.info('%s' % (infos['target']))
+    site = Site()
+    actions = site.get_actions_to(infos['target'])
+    for action in actions:
+        action.do()
+    return jsonify(gexf=etree.tostring(site.get_gexf()).decode('utf-8'), current_page=site.current)
+
+@app.route('/back_to_start.json', methods=['GET'])
+def back_to_start():
+    logging.info('getting back to start point')
+    site = Site()
+    browser = Browser()
+    browser.get()
+    return jsonify(gexf=etree.tostring(site.get_gexf()).decode('utf-8'), current_page=site.current)
+
 @app.route('/default-target.json')
 def default_target():
     config = Configuration()

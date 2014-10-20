@@ -1,6 +1,4 @@
 remove actions from node start
-restart from beginning
-go to other node
 stop redrawing nodes at random places after actions
 flow should be : input css selector -> search -> select an object -> beginning or continue -> choose action on object (click, input, ...) and order of actions -> validate connection
 connection from multiple actions
