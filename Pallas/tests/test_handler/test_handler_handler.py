@@ -146,7 +146,7 @@ class Test_Handler_Handler(object):
         dummy = DummyBrowser(random.random())
         conf = Configuration()
         headers = [('Content-Type', 'application/json')]
-        url = 'http://{}.url/startpage'.format(str(uuid.uuid4()))
+        url = 'http://{0}.url/startpage'.format(str(uuid.uuid4()))
         data = {'browser': 'Dummy', 'proxy_path': None, 'proxy': "no proxy", 'url': url}
         json_data = json.dumps(data)
         json_data_length = len(json_data)
