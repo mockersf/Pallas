@@ -11,8 +11,8 @@
 	</head>
 	<body ng-app="target" style="background-color: grey">
 		<div style="width: 900px; margin: 0px auto 0px auto; background-color: white;">
-			<div id="intro" style="width:100%; height:30px; background-color: blue;">
-				<form method=post ng-controller="targetController as target" ng-submit="target.start()">
+			<div id="intro" style="width:100%; height:30px; background-color: blue;" ng-controller="targetController as target">
+				<form method=post ng-submit="target.start()">
 					<input type="text" ng-model="target.url" placeholder="http://example.com/" ng-disabled="target.validated">
 					<select ng-model="target.browser" ng-options="browser for browser in target.browsers" title="browser" ng-show="!target.validated">
 					</select>
@@ -24,6 +24,7 @@
 					<input type="submit" value="Analyze" ng-show="!target.validated">
 					<input type="submit" value="New" ng-show="target.validated">
 				</form>
+				<a href ng-click="target.back_to_start()">Back to Start</a>
 			</div>
 			<div id="container" style="width:100%; height:500px;">
 			  <div id="graph-container" style="height:100%; width:700px; float: left; background-color: white;"></div>
@@ -32,7 +33,7 @@
 						{{siteData.site_url}}
 					</div>
 					<div id="node-details" ng-show="node">
-						details for node {{node_url}}
+						details for node {{node_url}} <a href ng-show="has_path_from_current && (node != siteData.current_node)" ng-click="follow_existing_connections(node)">Go to Node</a>
 						<div>
 							<form ng-submit="selectored()">
 								<input type="text" ng-model="css_selector">

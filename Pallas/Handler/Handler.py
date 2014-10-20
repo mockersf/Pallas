@@ -75,7 +75,8 @@ def node_details(node):
     if not node in site._pages:
         abort(404)
     page = site._pages[node]
-    return jsonify(url=page.url, html=page.html_source)
+    has_path = site.get_actions_to(node) is not None
+    return jsonify(url=page.url, html=page.html_source, has_path=has_path)
 
 @app.route('/s/<path:filename>')
 def send_file(filename):

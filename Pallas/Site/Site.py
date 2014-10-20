@@ -72,6 +72,8 @@ class Site:
     def get_actions_to(self, page):
         connections = self.find_shortest_path(self._current, page)
         actions = []
+        if connections is None:
+            return None
         for connection in connections:
             actions += [self.get_action(connection)]
         return actions

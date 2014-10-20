@@ -80,6 +80,7 @@
           $scope.node_url = data.url;
           $scope.html_source = data.html;
           $scope.docu = (new DOMParser()).parseFromString($scope.html_source, 'text/html');
+          $scope.has_path_from_current = data.has_path;
         });
       }
     };
