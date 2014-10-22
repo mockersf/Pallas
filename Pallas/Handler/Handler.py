@@ -76,7 +76,19 @@ def node_details(node):
         abort(404)
     page = site._pages[node]
     has_path = site.get_actions_to(node) is not None
-    return jsonify(url=page.url, html=page.html_source, has_path=has_path)
+    return jsonify(url=page.url, html=page.html_source, has_path=has_path, connections=site.get_actions_from_page(node))
+
+@app.route('/follow/<connection>.json')
+def follow(connection):
+    config = Configuration()
+    site = Site()
+    if not connection in site._connections:
+        abort(404)
+    if site._connections[connection]['from'] != site.current:
+        abort(500)
+    action = site.get_action_from_id(connection)
+    action.do()
+    return jsonify(gexf=etree.tostring(site.get_gexf()).decode('utf-8'), current_page=site.current)
 
 @app.route('/s/<path:filename>')
 def send_file(filename):

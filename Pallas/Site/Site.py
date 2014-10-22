@@ -55,7 +55,7 @@ class Site:
                 self._connections[connections[0]]['explored'] = True
                 self._connections[connections[0]]['to'] = uniq_page
         else:
-            self._connections[uuid.uuid4()] = {'from': "start", 'to': uniq_page, 'explored': True, 'type': self.ConnectionTypes.START, 'data': {'url': url}}
+            self._connections[str(uuid.uuid4())] = {'from': "start", 'to': uniq_page, 'explored': True, 'type': self.ConnectionTypes.START, 'data': {'url': url}}
         if uniq_page not in self._pages:
             self._pages[uniq_page] = Page(url, html_source)
         self._current = uniq_page
@@ -64,7 +64,7 @@ class Site:
     def add_link(self, url):
         connections = [connection for connection in list(self._connections.values()) if connection['from'] == self._current and connection['type'] == self.ConnectionTypes.LINK and connection['data']['url'] == url]
         if len(connections) == 0:
-            self._connections[uuid.uuid4()] = {'from': self._current, 'to': None, 'explored': False, 'type': self.ConnectionTypes.LINK, 'data': {'url': url}}
+            self._connections[str(uuid.uuid4())] = {'from': self._current, 'to': None, 'explored': False, 'type': self.ConnectionTypes.LINK, 'data': {'url': url}}
 
     def get_distance_to(self, connection_uuid):
         return len(self.get_actions_to(self._connections[connection_uuid]['from']))
@@ -80,6 +80,9 @@ class Site:
 
     def get_action(self, connection):
         return self.get_action_from_id(connection['id'])
+
+    def get_actions_from_page(self, page_id):
+        return [{'id': id, 'connection': self._connections[id]} for id in self._connections if self._connections[id]['from'] == page_id]
 
     def get_action_from_id(self, connection_id):
         connection = self._connections[connection_id]
@@ -125,7 +128,7 @@ class Site:
         return self._pages[self._current]
 
     def add_connection_to_current_page(self, connection_type, css, nb):
-        id = uuid.uuid4()
+        id = str(uuid.uuid4())
         self._connections[id] = {'from': self._current, 'to': None, 'explored': False, 'type': connection_type, 'data': {'css': css, 'nb': nb}}
         return id
 

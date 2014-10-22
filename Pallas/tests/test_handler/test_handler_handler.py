@@ -170,27 +170,45 @@ class Test_Handler_Handler(object):
         assert dummy.actions[1]['target'] == css1
         assert dummy.actions[2]['action'] == 'element.click'
         assert dummy.actions[2]['target'] == 'new_match_css_%s' % css1
+        assert len(site._connections) == 2
         css2 = str(uuid.uuid4())
         data = {'css': css2, 'nb': 0}
         json_data = json.dumps(data)
         json_data_length = len(json_data)
         headers.append(('Content-Length', json_data_length))
+        rv = self.app.get('/back_to_start.json')
+        json_returned = json.loads(rv.data.decode('utf-8'))
+        assert rv.status_code == 200
+        assert dummy.actions[3]['action'] == 'get'
+        assert dummy.actions[3]['target'] == url
+        assert json_returned['current_page'] == site.current
+        assert site.get_current_page().url == url
+        assert len(site._connections) == 3 # to investigate : shoudn't it be 2 ?
+        connection_id = [id for id in site._connections if site._connections[id]['from'] != 'start'][0]
+        rv = self.app.get('/follow/{0}.json'.format(connection_id))
+        assert rv.status_code == 200
+        assert len(site._connections) == 3
+        assert dummy.actions[4]['action'] == 'find_elements_by_css_selector'
+        assert dummy.actions[4]['target'] == css1
+        assert dummy.actions[5]['action'] == 'element.click'
+        assert dummy.actions[5]['target'] == 'new_match_css_%s' % css1
         rv = self.app.post('/add_connection_and_go', headers=headers, data=json_data)
         json_returned = json.loads(rv.data.decode('utf-8'))
         assert rv.status_code == 200
         assert json_returned['gexf'] == etree.tostring(site.get_gexf()).decode('utf-8')
         assert json_returned['current_page'] == site.current
-        assert len(dummy.actions) == 5
-        assert dummy.actions[3]['action'] == 'find_elements_by_css_selector'
-        assert dummy.actions[3]['target'] == css2
-        assert dummy.actions[4]['action'] == 'element.click'
-        assert dummy.actions[4]['target'] == 'new_match_css_%s' % css2
+        assert len(dummy.actions) == 8
+        assert dummy.actions[6]['action'] == 'find_elements_by_css_selector'
+        assert dummy.actions[6]['target'] == css2
+        assert dummy.actions[7]['action'] == 'element.click'
+        assert dummy.actions[7]['target'] == 'new_match_css_%s' % css2
+        assert len(site._connections) == 4
         end_page = site.current
         rv = self.app.get('/back_to_start.json')
         json_returned = json.loads(rv.data.decode('utf-8'))
         assert rv.status_code == 200
-        assert dummy.actions[5]['action'] == 'get'
-        assert dummy.actions[5]['target'] == url
+        assert dummy.actions[8]['action'] == 'get'
+        assert dummy.actions[8]['target'] == url
         assert json_returned['current_page'] == site.current
         assert site.get_current_page().url == url
         data = {'target': end_page}
@@ -202,11 +220,17 @@ class Test_Handler_Handler(object):
         assert rv.status_code == 200
         assert json_returned['current_page'] == site.current
         assert json_returned['current_page'] == end_page
-        assert dummy.actions[6]['action'] == 'find_elements_by_css_selector'
-        assert dummy.actions[6]['target'] == css1
-        assert dummy.actions[7]['action'] == 'element.click'
-        assert dummy.actions[7]['target'] == 'new_match_css_%s' % css1
-        assert dummy.actions[8]['action'] == 'find_elements_by_css_selector'
-        assert dummy.actions[8]['target'] == css2
-        assert dummy.actions[9]['action'] == 'element.click'
-        assert dummy.actions[9]['target'] == 'new_match_css_%s' % css2
+        assert dummy.actions[9]['action'] == 'find_elements_by_css_selector'
+        assert dummy.actions[9]['target'] == css1
+        assert dummy.actions[10]['action'] == 'element.click'
+        assert dummy.actions[10]['target'] == 'new_match_css_%s' % css1
+        assert dummy.actions[11]['action'] == 'find_elements_by_css_selector'
+        assert dummy.actions[11]['target'] == css2
+        assert dummy.actions[12]['action'] == 'element.click'
+        assert dummy.actions[12]['target'] == 'new_match_css_%s' % css2
+        rv = self.app.get('/follow/{0}.json'.format(connection_id))
+        assert rv.status_code == 500
+        assert len(dummy.actions) == 13
+        rv = self.app.get('/follow/{0}.json'.format(str(uuid.uuid4())))
+        assert rv.status_code == 404
+        assert len(dummy.actions) == 13

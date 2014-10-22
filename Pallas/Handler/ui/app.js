@@ -68,21 +68,43 @@
     $scope.docu = null;
     $scope.css_selector = "";
     $scope.results = [];
+    $scope.connections = [];
     $scope.selected = null;
+    $scope.nodeTab = 'none';
 
     $scope.set_node = function(node) {
       $scope.node = node;
       $scope.results = [];
+      $scope.connections = [];
       $scope.docu = null;
       $scope.selected = null;
+      $scope.nodeTab = 'none';
       if (node != "") {
         $http.get('/details/' + node + '.json').success(function(data){
           $scope.node_url = data.url;
           $scope.html_source = data.html;
           $scope.docu = (new DOMParser()).parseFromString($scope.html_source, 'text/html');
           $scope.has_path_from_current = data.has_path;
+          $scope.nodeTab = 'cssSelector';
+          data.connections.forEach(function(connection) {
+            details = {
+              connection: connection.connection,
+              id: connection.id,
+              name: connection.connection.type + " " + JSON.stringify(connection.connection.data)
+            }
+            $scope.connections.push(details);
+          });
         });
       }
+    };
+
+    $scope.follow_connection = function(index) {
+      connection_id = $scope.connections[index].id;
+      $http.get('/follow/' + connection_id + '.json').success(function(data){
+        $scope.siteData.current_node = data.current_page
+        s = sigma.instances()[0];
+        sigma.parsers.gexf(parseXml(data.gexf), s, placeNodes);
+      });
     };
 
     $scope.selectored = function() {

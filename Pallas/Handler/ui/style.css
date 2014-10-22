@@ -1,0 +1,53 @@
+/* general container */
+.frame {
+  width: 960px;
+  margin: 0px auto 0px auto;
+  background-color: white;
+}
+
+#intro {
+  width: 100%;
+  height: 30px;
+  background-color: blue;
+}
+
+#container {
+  width: 100%;
+  height: 600px;
+}
+
+#graph-container {
+  height: 100%;
+  width: 760px;
+  float: left;
+  background-color: white;
+}
+
+#details {
+  height: 100%;
+  width: 200px;
+  background-color: yellow;
+  margin-left: 760px;
+}
+
+/* tabs for options on a node */
+.nodenav {
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+}
+
+li.nodenavpill {
+    float: left;
+    background-color: #DDDDDD;
+    display: block;
+    width: 100px;
+    text-align: center;
+    text-color: #555555;
+}
+
+li.nodenavpillactive {
+    background-color: #FFFFFF;
+    text-color: #000000;
+}

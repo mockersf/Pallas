@@ -3,6 +3,7 @@
 	<head>
 		<title>Pallas</title>
 		<script type="text/javascript" src='https://ajax.googleapis.com/ajax/libs/angularjs/1.3.0-rc.4/angular.min.js'></script>
+		<link rel="stylesheet" type="text/css" href="s/style.css" />
 		<script type="text/javascript" src='s/app.js'></script>
 		<script type="text/javascript" src='s/sigma.min.js'></script>
 		<script type="text/javascript" src='s/sigma.parsers.gexf.min.js'></script>
@@ -10,8 +11,8 @@
 		<script type="text/javascript" src='s/sigma.plugins.dragNodes.min.js'></script>
 	</head>
 	<body ng-app="target" style="background-color: grey">
-		<div style="width: 900px; margin: 0px auto 0px auto; background-color: white;">
-			<div id="intro" style="width:100%; height:30px; background-color: blue;" ng-controller="targetController as target">
+		<div class="frame">
+			<div id="intro" ng-controller="targetController as target">
 				<form method=post ng-submit="target.start()">
 					<input type="text" ng-model="target.url" placeholder="http://example.com/" ng-disabled="target.validated">
 					<select ng-model="target.browser" ng-options="browser for browser in target.browsers" title="browser" ng-show="!target.validated">
@@ -26,33 +27,50 @@
 				</form>
 				<a href ng-click="target.back_to_start()">Back to Start</a>
 			</div>
-			<div id="container" style="width:100%; height:500px;">
-			  <div id="graph-container" style="height:100%; width:700px; float: left; background-color: white;"></div>
-				<div id="details" style="height:100%; width:200px; background-color: yellow; margin-left: 700px;" ng-controller="detailsController as details">
+			<div id="container">
+			  <div id="graph-container"></div>
+				<div id="details" ng-controller="detailsController as details">
 					<div id="site-details" ng-show="siteData.site_url && !node">
 						{{siteData.site_url}}
 					</div>
 					<div id="node-details" ng-show="node">
-						details for node {{node_url}} <a href ng-show="has_path_from_current && (node != siteData.current_node)" ng-click="follow_existing_connections(node)">Go to Node</a>
-						<div>
+						details for node {{node_url}}
+						<a href ng-show="has_path_from_current && (node != siteData.current_node)" ng-click="follow_existing_connections(node)">Go to Node</a>
+						<ul class="nodenav">
+							<li class="nodenavpill" ng-class="{ nodenavpillactive:nodeTab == 'cssSelector' }">
+								<a href ng-click="nodeTab = 'cssSelector'">CSS Selector</a>
+							</li>
+							<li class="nodenavpill" ng-class="{ nodenavpillactive:nodeTab == 'connections' }">
+								<a href ng-click="nodeTab = 'connections'">Connections</a>
+							</li>
+						</ul>
+
+						<div ng-show="nodeTab == 'cssSelector'">
 							<form ng-submit="selectored()">
 								<input type="text" ng-model="css_selector">
 								<input type="submit" value="Search">
 							</form>
+							{{results.length}} result(s) matching
+							<ul id="selection_results">
+								<li ng-repeat="match in results track by $index">
+									<a href ng-click="view_match($index)">{{match.name}}</a>
+									<div ng-show="selected == $index">
+										<ul>
+											<li>{{match.object.id}}</li>
+											<li>{{match.object.href}}</li>
+											<li ng-show="node == siteData.current_node"><a href ng-click="go_to($index)">Click</a></li>
+										</ul>
+									</div>
+								</li>
+							</ul>
 						</div>
-						{{results.length}} result(s) matching
-						<ul id="selection_results">
-							<li ng-repeat="match in results track by $index">
-								<a href ng-click="view_match($index)">{{match.name}}</a>
-								<div ng-show="selected == $index">
-									<ul>
-										<li>{{match.object.id}}</li>
-										<li>{{match.object.href}}</li>
-										<li ng-show="node == siteData.current_node"><a href ng-click="go_to($index)">Click</a></li>
-									</ul>
-								</div>
-							</li>
-						</ul>
+						<div ng-show="nodeTab == 'connections'">
+							<ul id="connections_results">
+								<li ng-repeat="connection in connections track by $index">
+									<a href ng-click="follow_connection($index)">{{connection.name}}</a>
+								</li>
+							</ul>
+						</div>
 					</div>
 				</div>
 			</div>
