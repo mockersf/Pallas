@@ -65,11 +65,12 @@ class Browser:
             for entry in self._proxy_client.har['log']['entries']:
                 page.add_call(entry)
 
-    def get(self, url=None):
+    def get(self, url):
         self.setup('get')
-        logging.info('going to %s' % (self._site.url))
-        self._driver.get(self._site.url)
-        self.teardown('get')
+        logging.info('going to {0}'.format(url))
+        connection_id = self._site.add_connection_to_start(url)
+        self._driver.get(url)
+        self.teardown('get', connection_id)
 
     def click(self, action):
         self.setup('click')

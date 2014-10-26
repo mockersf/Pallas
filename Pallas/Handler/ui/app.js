@@ -31,7 +31,7 @@
     this.start = function() {
       if (!this.validated) {
         config = {};
-        config['url'] = target.url;
+        config['name'] = target.name;
         config['browser'] = target.browser;
         config['proxy'] = target.proxy;
         config['proxy_path'] = target.proxy_path;
@@ -41,12 +41,12 @@
             s = sigma.instances()[0];
             sigma.parsers.gexf(parseXml(data.gexf), s, placeNodes);
           });
-        this.siteData.site_url = target.url;
+        this.siteData.site_name = target.name;
         this.validated = true;
       } else {
         sigma.instances()[0].graph.clear();
         sigma.instances()[0].refresh();
-        this.siteData.site_url = '';
+        this.siteData.site_name = '';
         this.validated = false;
       }
     };

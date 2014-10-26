@@ -11,6 +11,7 @@ class Action:
     class ActionType:
         CLICK = "click"
         FILL = "fill"
+        GET = 'get'
 
     def __init__(self, type, data, connection=None):
         self._type = type
@@ -21,9 +22,18 @@ class Action:
         return "<Action ('%s', '%s', '%s')" % (self._type, self._data, self._connection)
 
     def do(self):
-        if self._type == self.ActionType.CLICK:
-            browser = Browser()
-            browser.click(self)
+        try:
+            if self._type == self.ActionType.GET:
+                browser = Browser()
+                browser.get(self._data['url'])
+                return
+            if self._type == self.ActionType.CLICK:
+                browser = Browser()
+                browser.click(self)
+                return
+            raise Exception('unknown action type')
+        except Exception as e:
+            logging.warning("couldn't do action {0} : {1}".format(self, e))
 
     @property
     def connection(self):

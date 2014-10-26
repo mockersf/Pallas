@@ -17,25 +17,25 @@ class Test_Site_Site(object):
 
     def test_singleton(self):
         from Site.Site import Site
-        host = '%s.url' % uuid.uuid4()
-        site = Site('http://%s/' % host)
-        assert site.hostname == host
+        name = str(uuid.uuid4())
+        site = Site(name)
+        assert site.name == name
         site2 = Site()
-        assert site.hostname == host
+        assert site.name == name
 
-    def test_getting_hostname(self):
-        from Site.Site import Site
-        host = '%s.url' % uuid.uuid4()
-        site = Site('http://%s/' % host)
-        assert site.hostname == host
+#    def test_getting_hostname(self):
+#        from Site.Site import Site
+#        host = '%s.url' % uuid.uuid4()
+#        site = Site('http://%s/' % host)
+#        assert site.hostname == host
 
     def test_adding_one_page(self):
         from Site.Site import Site
         site = Site('%s.url' % uuid.uuid4())
-        assert len(site._pages) == 0
+        assert len(site._pages) == 1
         url = str(uuid.uuid4())
         page = site.current_page("<html></html>", url)
-        assert len(site._pages) == 1
+        assert len(site._pages) == 2
         assert page._url == url
         assert page._interests == []
         assert page._calls == []
@@ -43,30 +43,30 @@ class Test_Site_Site(object):
     def test_adding_two_page(self):
         from Site.Site import Site
         site = Site('%s.url' % uuid.uuid4())
-        assert len(site._pages) == 0
+        assert len(site._pages) == 1
         site.current_page("<html></html>", 'http://google.com/')
         site.current_page("<html><body></body></html>", 'http://google.com/2')
-        assert len(site._pages) == 2
+        assert len(site._pages) == 3
 
     def test_adding_same_page_twice(self):
         from Site.Site import Site
         site = Site('%s.url' % uuid.uuid4())
-        assert len(site._pages) == 0
-        page = site.current_page("<html></html>", 'http://google.com/')
         assert len(site._pages) == 1
+        page = site.current_page("<html></html>", 'http://google.com/')
+        assert len(site._pages) == 2
         call = str(uuid.uuid4())
         page.add_call(call)
         page2 = site.current_page("<html></html>", 'http://google.com/')
-        assert len(site._pages) == 1
+        assert len(site._pages) == 2
         assert page2._calls == [call]
 
     def test_repr_getter(self):
         from Site.Site import Site
-        url = "http://%s.url/for/page" % uuid.uuid4()
-        site = Site(url)
-        assert site.__repr__() == ("<Site ('%s')>" % (url))
-        assert site.url == url
-        assert site.current == None
+        name = str(uuid.uuid4())
+        site = Site(name)
+        assert site.__repr__() == ("<Site ('{0}')>".format(name))
+        assert site.name == name
+        assert site.current == 'start'
         assert site.current == site._current
 
     def test_add_link(self):
@@ -79,7 +79,9 @@ class Test_Site_Site(object):
         connection1 = {'from': current_page, 'type': Site().ConnectionTypes.LINK, 'explored': False, 'to': None, 'data': {'url': url}}
         site.add_link(url)
         assert len(site._connections) == 1
-        assert list(site._connections.values())[0] == connection1
+        connection_check = connection1
+        connection_check['data'] = {'url': url, 'nb': 0, 'css': '[href="{0}"]'.format(url)}
+        assert list(site._connections.values())[0] == connection_check
         site.add_link(url)
         assert len(site._connections) == 1
 
@@ -124,23 +126,23 @@ class Test_Site_Site(object):
         connection_0_id = str(uuid.uuid4())
         connection_0_content = {'from': 'start', 'to': node_start, 'explored': True, 'type': site.ConnectionTypes.START, 'data': {'url': site_url}}
         connection_1_id = str(uuid.uuid4())
-        connection_1_url = str(uuid.uuid4())
-        connection_1_content = {'from': node_start, 'to': node_1, 'explored': True, 'type': site.ConnectionTypes.LINK, 'data': {'url': connection_1_url}}
+        connection_1_data = {'css': str(uuid.uuid4()), 'nb': 0}
+        connection_1_content = {'from': node_start, 'to': node_1, 'explored': True, 'type': site.ConnectionTypes.LINK, 'data': connection_1_data}
         connection_2_id = str(uuid.uuid4())
-        connection_2_url = str(uuid.uuid4())
-        connection_2_content = {'from': node_1, 'to': node_2, 'explored': True, 'type': site.ConnectionTypes.LINK, 'data': {'url': connection_2_url}}
+        connection_2_data = {'css': str(uuid.uuid4()), 'nb': 0}
+        connection_2_content = {'from': node_1, 'to': node_2, 'explored': True, 'type': site.ConnectionTypes.LINK, 'data': connection_2_data}
         connection_3_id = str(uuid.uuid4())
-        connection_3_url = str(uuid.uuid4())
-        connection_3_content = {'from': node_2, 'to': node_end, 'explored': True, 'type': site.ConnectionTypes.LINK, 'data': {'url': connection_3_url}}
+        connection_3_data = {'css': str(uuid.uuid4()), 'nb': 0}
+        connection_3_content = {'from': node_2, 'to': node_end, 'explored': True, 'type': site.ConnectionTypes.LINK, 'data': connection_3_data}
         connection_4_id = str(uuid.uuid4())
-        connection_4_url = str(uuid.uuid4())
-        connection_4_content = {'from': node_2, 'to': node_1, 'explored': True, 'type': site.ConnectionTypes.LINK, 'data': {'url': connection_4_url}}
+        connection_4_data = {'css': str(uuid.uuid4()), 'nb': 0}
+        connection_4_content = {'from': node_2, 'to': node_1, 'explored': True, 'type': site.ConnectionTypes.LINK, 'data': connection_4_data}
         connection_5_id = str(uuid.uuid4())
-        connection_5_url = str(uuid.uuid4())
-        connection_5_content = {'from': node_start, 'to': node_2, 'explored': True, 'type': site.ConnectionTypes.LINK, 'data': {'url': connection_5_url}}
+        connection_5_data = {'css': str(uuid.uuid4()), 'nb': 0}
+        connection_5_content = {'from': node_start, 'to': node_2, 'explored': True, 'type': site.ConnectionTypes.LINK, 'data': connection_5_data}
         connection_6_id = str(uuid.uuid4())
-        connection_6_url = str(uuid.uuid4())
-        connection_6_content = {'from': node_end, 'to': None, 'explored': False, 'type': site.ConnectionTypes.LINK, 'data': {'url': connection_6_url}}
+        connection_6_data = {'css': str(uuid.uuid4()), 'nb': 0}
+        connection_6_content = {'from': node_end, 'to': None, 'explored': False, 'type': site.ConnectionTypes.LINK, 'data': connection_6_data}
         site._connections[connection_0_id] = connection_0_content
         site._connections[connection_1_id] = connection_1_content
         site._connections[connection_2_id] = connection_2_content
@@ -158,34 +160,28 @@ class Test_Site_Site(object):
         site._pages[node_end] = Page('node_end', html_end)
         site._current = node_start
         path = site.find_shortest_path(node_start, node_end)
-        assert path[0] == {'connection': {'from': node_start, 'to': node_2, 'explored': True, 'type': site.ConnectionTypes.LINK, 'data': {'url': connection_5_url}}, 'id': connection_5_id}
-        assert path[1] == {'connection': {'from': node_2, 'to': node_end, 'explored': True, 'type': site.ConnectionTypes.LINK, 'data': {'url': connection_3_url}}, 'id': connection_3_id}
+        assert path[0] == {'connection': {'from': node_start, 'to': node_2, 'explored': True, 'type': site.ConnectionTypes.LINK, 'data': connection_5_data}, 'id': connection_5_id}
+        assert path[1] == {'connection': {'from': node_2, 'to': node_end, 'explored': True, 'type': site.ConnectionTypes.LINK, 'data': connection_3_data}, 'id': connection_3_id}
         actions = site.get_actions_to(node_end)
         assert len(actions) == 2
         assert actions[0]._type == Action.ActionType.CLICK
         assert actions[0].connection == connection_5_id
-        assert actions[0].data['xpath'] == "//a[contains(@href, '%s')]" % connection_5_url
         assert actions[1]._type == Action.ActionType.CLICK
         assert actions[1].connection == connection_3_id
-        assert actions[1].data['xpath'] == "//a[contains(@href, '%s')]" % connection_3_url
         assert site.get_distance_to(connection_6_id) == 2
         actions = site.get_first_connection_unexplored()
         assert len(actions) == 3
         assert actions[0]._type == Action.ActionType.CLICK
         assert actions[0].connection == connection_5_id
-        assert actions[0].data['xpath'] == "//a[contains(@href, '%s')]" % connection_5_url
         assert actions[1]._type == Action.ActionType.CLICK
         assert actions[1].connection == connection_3_id
-        assert actions[1].data['xpath'] == "//a[contains(@href, '%s')]" % connection_3_url
         assert actions[2]._type == Action.ActionType.CLICK
         assert actions[2].connection == connection_6_id
-        assert actions[2].data['xpath'] == "//a[contains(@href, '%s')]" % connection_6_url
         site._current = node_end
         actions = site.get_first_connection_unexplored()
         assert len(actions) == 1
         assert actions[0]._type == Action.ActionType.CLICK
         assert actions[0].connection == connection_6_id
-        assert actions[0].data['xpath'] == "//a[contains(@href, '%s')]" % connection_6_url
         html = str('<html><body><div>new_page</div></body></html>')
         page = site.current_page(html, '', connection_6_id)
         assert site._pages[site.get_uniq_id(html, '')] == page

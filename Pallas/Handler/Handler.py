@@ -25,14 +25,19 @@ def start():
         Configuration().proxy_path = None
     else:
         Configuration().proxy_path = starter['proxy_path']
-    site = Site(starter['url'])
+    site = Site(starter['name'])
     browser = Browser()
     browser.start(site)
+    return jsonify(gexf=etree.tostring(site.get_gexf()).decode('utf-8'), current_page=site.current)
 
-    # strange behaviour from browsermob proxy, dsn doesn't always work
-    browser.add_remap_urls([site.hostname])
-
-    browser.get()
+@app.route('/get_from_start', methods=['POST'])
+def get_from_start():
+    starter = request.get_json()
+    site = Site()
+    if site.current != 'start':
+        abort(500)
+    browser = Browser()
+    browser.get(starter['url'])
     return jsonify(gexf=etree.tostring(site.get_gexf()).decode('utf-8'), current_page=site.current)
 
 @app.route('/add_connection_and_go', methods=['POST'])
@@ -59,8 +64,9 @@ def follow_existing_connections():
 def back_to_start():
     logging.info('getting back to start point')
     site = Site()
-    browser = Browser()
-    browser.get()
+    #browser = Browser()
+    #browser.get()
+    site.back_to_start()
     return jsonify(gexf=etree.tostring(site.get_gexf()).decode('utf-8'), current_page=site.current)
 
 @app.route('/default-target.json')
@@ -72,6 +78,8 @@ def default_target():
 def node_details(node):
     config = Configuration()
     site = Site()
+    if node == 'start':
+        return jsonify(url='start', html='start', has_path=True, connections=site.get_actions_from_page(node))
     if not node in site._pages:
         abort(404)
     page = site._pages[node]

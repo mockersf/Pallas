@@ -1,4 +1,8 @@
 import logging
+try:
+    from urllib.parse import urlparse
+except ImportError:
+    from urlparse import urlparse
 
 from Main.Configuration import Configuration
 from Main.Browser import Browser
@@ -15,9 +19,9 @@ def check_website(url):
     browser.start(site)
 
     # strange behaviour from browsermob proxy, dsn doesn't always work
-    browser.add_remap_urls([site.hostname])
+    browser.add_remap_urls([urlparse(url).hostname])
 
-    browser.get()
+    browser.get(url)
     browser.study_state()
     actions = site.get_first_connection_unexplored()
     while actions is not None:

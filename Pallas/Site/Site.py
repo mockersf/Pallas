@@ -1,7 +1,3 @@
-try:
-    from urllib.parse import urlparse
-except ImportError:
-    from urlparse import urlparse
 import hashlib
 import logging
 import uuid
@@ -14,7 +10,8 @@ from Main.singleton import singleton
 
 @singleton
 class Site:
-    _url = None
+#    _url = None
+    _name = None
     _pages = None
     _connections = None
     _current = None
@@ -24,26 +21,31 @@ class Site:
         START = "start"
         FORM = "form"
 
-    def __init__(self, url):
-        self._url = url
-        self._pages = {}
+    def __init__(self, name):
+        self._name = name
+        self._pages = {'start': 'start'}
         self._connections = {}
+        self._current = 'start'
 
     def __repr__(self):
-        return "<Site ('%s')>" % (self._url)
+        return "<Site ('%s')>" % (self._name)
 
+#    @property
+#    def url(self):
+#        return self._url
+#
     @property
-    def url(self):
-        return self._url
+    def name(self):
+        return self._name
 
     @property
     def current(self):
         return self._current
 
-    @property
-    def hostname(self):
-        return urlparse(self._url).hostname
-
+#    @property
+#    def hostname(self):
+#        return urlparse(self._url).hostname
+#
     def get_uniq_id(self, html_source, url):
         return hashlib.md5(html_source.encode('utf-8')).hexdigest()
 
@@ -61,10 +63,13 @@ class Site:
         self._current = uniq_page
         return self._pages[uniq_page]
 
+    def back_to_start(self):
+        self._current = 'start'
+
     def add_link(self, url):
         connections = [connection for connection in list(self._connections.values()) if connection['from'] == self._current and connection['type'] == self.ConnectionTypes.LINK and connection['data']['url'] == url]
         if len(connections) == 0:
-            self._connections[str(uuid.uuid4())] = {'from': self._current, 'to': None, 'explored': False, 'type': self.ConnectionTypes.LINK, 'data': {'url': url}}
+            self._connections[str(uuid.uuid4())] = {'from': self._current, 'to': None, 'explored': False, 'type': self.ConnectionTypes.LINK, 'data': {'url': url, 'css': '[href="{0}"]'.format(url), 'nb': 0}}
 
     def get_distance_to(self, connection_uuid):
         return len(self.get_actions_to(self._connections[connection_uuid]['from']))
@@ -86,9 +91,11 @@ class Site:
 
     def get_action_from_id(self, connection_id):
         connection = self._connections[connection_id]
-        if 'url' in connection['data']:
-            xpath = "//a[contains(@href, '%s')]" % (connection['data']['url'][len(self._url):] if self._url in connection['data']['url'] else connection['data']['url'])
-            return Action(type=Action.ActionType.CLICK, data={'xpath' : xpath, 'find' : lambda driver: driver.find_element_by_xpath(xpath)}, connection=connection_id)
+        if connection['type'] == self.ConnectionTypes.START:
+            return Action(type=Action.ActionType.GET, data={'url' : connection['data']['url']}, connection=connection_id)
+#        if 'url' in connection['data']:
+#            xpath = "//a[contains(@href, '%s')]" % (connection['data']['url'][len(self._url):] if self._url in connection['data']['url'] else connection['data']['url'])
+#            return Action(type=Action.ActionType.CLICK, data={'xpath' : xpath, 'find' : lambda driver: driver.find_element_by_xpath(xpath)}, connection=connection_id)
         if 'css' in connection['data']:
             css = connection['data']['css']
             nb = connection['data']['nb']
@@ -132,6 +139,11 @@ class Site:
         self._connections[id] = {'from': self._current, 'to': None, 'explored': False, 'type': connection_type, 'data': {'css': css, 'nb': nb}}
         return id
 
+    def add_connection_to_start(self, url):
+        id = str(uuid.uuid4())
+        self._connections[id] = {'from': 'start', 'to': None, 'explored': False, 'type': self.ConnectionTypes.START, 'data': {'url': url}}
+        return id
+
     def show_graph(self):
         logging.info("start")
         for id in [id for id in self._connections if self._connections[id]['from'] == "start"]:
@@ -143,10 +155,10 @@ class Site:
 
     def get_gexf(self):
         from gexf import Gexf
-        gexf = Gexf("Pallas", self.url)
+        gexf = Gexf("Pallas", self.name)
         graph = gexf.addGraph("directed", "static", "Current site exploration")
         graph.addNode('start', 'start')
-        for page in self._pages:
+        for page in [page for page in self._pages if page != 'start']:
           graph.addNode(page, self._pages[page]._url)
         for id in [id for id in self._connections if self._connections[id]['from'] == "start"]:
           graph.addEdge(id, "start", self._connections[id]['to'])

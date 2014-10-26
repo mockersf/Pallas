@@ -14,7 +14,7 @@
 		<div class="frame">
 			<div id="intro" ng-controller="targetController as target">
 				<form method=post ng-submit="target.start()">
-					<input type="text" ng-model="target.url" placeholder="http://example.com/" ng-disabled="target.validated">
+					<input type="text" ng-model="target.name" placeholder="Great Website" ng-disabled="target.validated">
 					<select ng-model="target.browser" ng-options="browser for browser in target.browsers" title="browser" ng-show="!target.validated">
 					</select>
 					<span ng-show="target.validated">{{target.browser}}</span>
@@ -30,15 +30,18 @@
 			<div id="container">
 			  <div id="graph-container"></div>
 				<div id="details" ng-controller="detailsController as details">
-					<div id="site-details" ng-show="siteData.site_url && !node">
-						{{siteData.site_url}}
+					<div id="site-details" ng-show="siteData.site_name && !node">
+						{{siteData.site_name}}
 					</div>
 					<div id="node-details" ng-show="node">
 						details for node {{node_url}}
 						<a href ng-show="has_path_from_current && (node != siteData.current_node)" ng-click="follow_existing_connections(node)">Go to Node</a>
 						<ul class="nodenav">
-							<li class="nodenavpill" ng-class="{ nodenavpillactive:nodeTab == 'cssSelector' }">
+							<li class="nodenavpill" ng-class="{ nodenavpillactive:nodeTab == 'cssSelector' }" ng-show="node != 'start'">
 								<a href ng-click="nodeTab = 'cssSelector'">CSS Selector</a>
+							</li>
+							<li class="nodenavpill" ng-class="{ nodenavpillactive:nodeTab == 'URL' }" ng-show="node == 'start'">
+								<a href ng-click="nodeTab = 'URL'">URL</a>
 							</li>
 							<li class="nodenavpill" ng-class="{ nodenavpillactive:nodeTab == 'connections' }">
 								<a href ng-click="nodeTab = 'connections'">Connections</a>
@@ -63,6 +66,15 @@
 									</div>
 								</li>
 							</ul>
+						</div>
+						<div ng-show="nodeTab == 'URL'">
+							<form ng-submit="selectored()" ng-show="node == siteData.current_node">
+								<input type="text" ng-model="css_selector">
+								<input type="submit" value="Search">
+							</form>
+							<div ng-show="node != siteData.current_node">
+								{{siteData.site_name}}
+							</div>
 						</div>
 						<div ng-show="nodeTab == 'connections'">
 							<ul id="connections_results">

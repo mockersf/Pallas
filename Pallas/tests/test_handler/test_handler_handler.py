@@ -101,7 +101,14 @@ class Test_Handler_Handler(object):
         assert rv.status_code == 404
         rv = self.app.get('/details/%s.json' % site._current)
         assert rv.status_code == 200
-        for page in site._pages:
+        rv = self.app.get('/details/start.json')
+        assert rv.status_code == 200
+        node = json.loads(rv.data.decode('utf-8'))
+        assert len(node['connections']) == 1
+        assert node['url'] == 'start'
+        assert node['html'] == 'start'
+        assert node['has_path'] == True
+        for page in [page for page in site._pages if page != 'start']:
             rv = self.app.get('/details/%s.json' % page)
             assert rv.status_code == 200
             node = json.loads(rv.data.decode('utf-8'))
@@ -115,9 +122,9 @@ class Test_Handler_Handler(object):
         dummy = DummyBrowser(random.random())
         conf = Configuration(['-b', 'Dummy'])
         headers = [('Content-Type', 'application/json')]
-        url = str(uuid.uuid4())
+        name = str(uuid.uuid4())
         proxy_path = str(uuid.uuid4())
-        data = {'browser': 'Dummy', 'proxy_path': proxy_path, 'proxy': "no proxy", 'url': url}
+        data = {'browser': 'Dummy', 'proxy_path': proxy_path, 'proxy': "no proxy", 'name': name}
         json_data = json.dumps(data)
         json_data_length = len(json_data)
         headers.append(('Content-Length', json_data_length))
@@ -129,10 +136,30 @@ class Test_Handler_Handler(object):
         assert json_returned['current_page'] == site.current
         assert conf.browser == 'Dummy'
         assert conf.proxy_path is None
-        assert site.url == url
+        assert site.name == name
         assert len(site._pages) == 1
+        site = Site()
+        headers = [('Content-Type', 'application/json')]
+        url = 'http://{0}.url/startpage'.format(str(uuid.uuid4()))
+        data = {'url': url}
+        json_data = json.dumps(data)
+        json_data_length = len(json_data)
+        headers.append(('Content-Length', json_data_length))
+        rv = self.app.post('/get_from_start', headers=headers, data=json_data)
+        json_returned = json.loads(rv.data.decode('utf-8'))
+        assert rv.status_code == 200
+        assert json_returned['gexf'] == etree.tostring(site.get_gexf()).decode('utf-8')
+        assert json_returned['current_page'] == site.current
+        assert site.current != 'start'
+        action_i = 0
+        assert dummy.actions[action_i] == {'action': 'get', 'target': url}
+        assert len(site._pages) == 2
         assert site._pages[site._current].url == url
-        data = {'browser': 'Dummy', 'proxy_path': proxy_path, 'proxy': "browsermob proxy", 'url': url}
+        assert len(dummy.actions) == 1
+        rv = self.app.post('/get_from_start', headers=headers, data=json_data)
+        assert rv.status_code == 500
+        assert len(dummy.actions) == 1
+        data = {'browser': 'Dummy', 'proxy_path': proxy_path, 'proxy': "browsermob proxy", 'name': name}
         json_data = json.dumps(data)
         json_data_length = len(json_data)
         headers.append(('Content-Length', json_data_length))
@@ -146,12 +173,29 @@ class Test_Handler_Handler(object):
         dummy = DummyBrowser(random.random())
         conf = Configuration()
         headers = [('Content-Type', 'application/json')]
-        url = 'http://{0}.url/startpage'.format(str(uuid.uuid4()))
-        data = {'browser': 'Dummy', 'proxy_path': None, 'proxy': "no proxy", 'url': url}
+        name = str(uuid.uuid4())
+        data = {'browser': 'Dummy', 'proxy_path': None, 'proxy': "no proxy", 'name': name}
         json_data = json.dumps(data)
         json_data_length = len(json_data)
         headers.append(('Content-Length', json_data_length))
         self.app.post('/start', headers=headers, data=json_data)
+        ###
+        site = Site()
+        headers = [('Content-Type', 'application/json')]
+        url = 'http://{0}.url/startpage'.format(str(uuid.uuid4()))
+        data = {'url': url}
+        json_data = json.dumps(data)
+        json_data_length = len(json_data)
+        headers.append(('Content-Length', json_data_length))
+        rv = self.app.post('/get_from_start', headers=headers, data=json_data)
+        json_returned = json.loads(rv.data.decode('utf-8'))
+        assert rv.status_code == 200
+        assert json_returned['gexf'] == etree.tostring(site.get_gexf()).decode('utf-8')
+        assert json_returned['current_page'] == site.current
+        assert site.current != 'start'
+        action_i = 0
+        assert dummy.actions[action_i] == {'action': 'get', 'target': url}
+        ###
         headers = [('Content-Type', 'application/json')]
         css1 = str(uuid.uuid4())
         data = {'css': css1, 'nb': 0}
@@ -165,11 +209,12 @@ class Test_Handler_Handler(object):
         assert json_returned['gexf'] == etree.tostring(site.get_gexf()).decode('utf-8')
         assert json_returned['current_page'] == site.current
         assert len(dummy.actions) == 3
-        assert dummy.actions[0] == {'action': 'get', 'target': url}
-        assert dummy.actions[1]['action'] == 'find_elements_by_css_selector'
-        assert dummy.actions[1]['target'] == css1
-        assert dummy.actions[2]['action'] == 'element.click'
-        assert dummy.actions[2]['target'] == 'new_match_css_%s' % css1
+        action_i += 1
+        assert dummy.actions[action_i]['action'] == 'find_elements_by_css_selector'
+        assert dummy.actions[action_i]['target'] == css1
+        action_i += 1
+        assert dummy.actions[action_i]['action'] == 'element.click'
+        assert dummy.actions[action_i]['target'] == 'new_match_css_%s' % css1
         assert len(site._connections) == 2
         css2 = str(uuid.uuid4())
         data = {'css': css2, 'nb': 0}
@@ -179,38 +224,51 @@ class Test_Handler_Handler(object):
         rv = self.app.get('/back_to_start.json')
         json_returned = json.loads(rv.data.decode('utf-8'))
         assert rv.status_code == 200
-        assert dummy.actions[3]['action'] == 'get'
-        assert dummy.actions[3]['target'] == url
+#        action_i += 1
+#        assert dummy.actions[3]['action'] == 'get'
+#        assert dummy.actions[3]['target'] == url
         assert json_returned['current_page'] == site.current
-        assert site.get_current_page().url == url
-        assert len(site._connections) == 3 # to investigate : shoudn't it be 2 ?
+        assert json_returned['current_page'] == 'start'
+#        assert site.get_current_page().url == url
+        assert len(site._connections) == 2
+        connection_id = [id for id in site._connections if site._connections[id]['from'] == 'start'][0]
+        rv = self.app.get('/follow/{0}.json'.format(connection_id))
+        assert rv.status_code == 200
+        assert len(site._connections) == 3
+        action_i += 1
+        assert dummy.actions[action_i]['action'] == 'get'
         connection_id = [id for id in site._connections if site._connections[id]['from'] != 'start'][0]
         rv = self.app.get('/follow/{0}.json'.format(connection_id))
         assert rv.status_code == 200
         assert len(site._connections) == 3
-        assert dummy.actions[4]['action'] == 'find_elements_by_css_selector'
-        assert dummy.actions[4]['target'] == css1
-        assert dummy.actions[5]['action'] == 'element.click'
-        assert dummy.actions[5]['target'] == 'new_match_css_%s' % css1
+        action_i += 1
+        assert dummy.actions[action_i]['action'] == 'find_elements_by_css_selector'
+        assert dummy.actions[action_i]['target'] == css1
+        action_i += 1
+        assert dummy.actions[action_i]['action'] == 'element.click'
+        assert dummy.actions[action_i]['target'] == 'new_match_css_%s' % css1
         rv = self.app.post('/add_connection_and_go', headers=headers, data=json_data)
         json_returned = json.loads(rv.data.decode('utf-8'))
         assert rv.status_code == 200
         assert json_returned['gexf'] == etree.tostring(site.get_gexf()).decode('utf-8')
         assert json_returned['current_page'] == site.current
         assert len(dummy.actions) == 8
-        assert dummy.actions[6]['action'] == 'find_elements_by_css_selector'
-        assert dummy.actions[6]['target'] == css2
-        assert dummy.actions[7]['action'] == 'element.click'
-        assert dummy.actions[7]['target'] == 'new_match_css_%s' % css2
+        action_i += 1
+        assert dummy.actions[action_i]['action'] == 'find_elements_by_css_selector'
+        assert dummy.actions[action_i]['target'] == css2
+        action_i += 1
+        assert dummy.actions[action_i]['action'] == 'element.click'
+        assert dummy.actions[action_i]['target'] == 'new_match_css_%s' % css2
         assert len(site._connections) == 4
         end_page = site.current
         rv = self.app.get('/back_to_start.json')
         json_returned = json.loads(rv.data.decode('utf-8'))
         assert rv.status_code == 200
-        assert dummy.actions[8]['action'] == 'get'
-        assert dummy.actions[8]['target'] == url
+#        action_i += 1
+#        assert dummy.actions[action_i]['action'] == 'get'
+#        assert dummy.actions[action_i]['target'] == url
         assert json_returned['current_page'] == site.current
-        assert site.get_current_page().url == url
+#        assert site.get_current_page().url == url
         data = {'target': end_page}
         json_data = json.dumps(data)
         json_data_length = len(json_data)
@@ -220,14 +278,20 @@ class Test_Handler_Handler(object):
         assert rv.status_code == 200
         assert json_returned['current_page'] == site.current
         assert json_returned['current_page'] == end_page
-        assert dummy.actions[9]['action'] == 'find_elements_by_css_selector'
-        assert dummy.actions[9]['target'] == css1
-        assert dummy.actions[10]['action'] == 'element.click'
-        assert dummy.actions[10]['target'] == 'new_match_css_%s' % css1
-        assert dummy.actions[11]['action'] == 'find_elements_by_css_selector'
-        assert dummy.actions[11]['target'] == css2
-        assert dummy.actions[12]['action'] == 'element.click'
-        assert dummy.actions[12]['target'] == 'new_match_css_%s' % css2
+        action_i += 1
+        assert dummy.actions[action_i]['action'] == 'get'
+        action_i += 1
+        assert dummy.actions[action_i]['action'] == 'find_elements_by_css_selector'
+        assert dummy.actions[action_i]['target'] == css1
+        action_i += 1
+        assert dummy.actions[action_i]['action'] == 'element.click'
+        assert dummy.actions[action_i]['target'] == 'new_match_css_%s' % css1
+        action_i += 1
+        assert dummy.actions[action_i]['action'] == 'find_elements_by_css_selector'
+        assert dummy.actions[action_i]['target'] == css2
+        action_i += 1
+        assert dummy.actions[action_i]['action'] == 'element.click'
+        assert dummy.actions[action_i]['target'] == 'new_match_css_%s' % css2
         rv = self.app.get('/follow/{0}.json'.format(connection_id))
         assert rv.status_code == 500
         assert len(dummy.actions) == 13
