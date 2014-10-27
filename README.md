@@ -10,7 +10,6 @@ Can currently use Firefox or PhantomJS to browse, and browsermobprroxy to check 
 To Do
 -----
 
-* remove actions from node start
 * stop redrawing nodes at random places after actions
 * flow should be : input css selector -> search -> select an object -> beginning or continue -> choose action on object (click, input, ...) and order of actions -> validate connection
 * going to an iframe of a page is a new page

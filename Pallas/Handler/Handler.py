@@ -30,6 +30,14 @@ def start():
     browser.start(site)
     return jsonify(gexf=etree.tostring(site.get_gexf()).decode('utf-8'), current_page=site.current)
 
+@app.route('/go_to_url', methods=['POST'])
+def go_to_url():
+    call = request.get_json()
+    browser = Browser()
+    site = Site()
+    browser.get(call['url'])
+    return jsonify(gexf=etree.tostring(site.get_gexf()).decode('utf-8'), current_page=site.current)
+
 @app.route('/get_from_start', methods=['POST'])
 def get_from_start():
     starter = request.get_json()
@@ -79,7 +87,7 @@ def node_details(node):
     config = Configuration()
     site = Site()
     if node == 'start':
-        return jsonify(url='start', html='start', has_path=True, connections=site.get_actions_from_page(node))
+        return jsonify(url='start', html='start', has_path=False, connections=site.get_actions_from_page(node))
     if not node in site._pages:
         abort(404)
     page = site._pages[node]

@@ -107,7 +107,7 @@ class Test_Handler_Handler(object):
         assert len(node['connections']) == 1
         assert node['url'] == 'start'
         assert node['html'] == 'start'
-        assert node['has_path'] == True
+        assert node['has_path'] == False
         for page in [page for page in site._pages if page != 'start']:
             rv = self.app.get('/details/%s.json' % page)
             assert rv.status_code == 200
@@ -224,9 +224,6 @@ class Test_Handler_Handler(object):
         rv = self.app.get('/back_to_start.json')
         json_returned = json.loads(rv.data.decode('utf-8'))
         assert rv.status_code == 200
-#        action_i += 1
-#        assert dummy.actions[3]['action'] == 'get'
-#        assert dummy.actions[3]['target'] == url
         assert json_returned['current_page'] == site.current
         assert json_returned['current_page'] == 'start'
 #        assert site.get_current_page().url == url
@@ -298,3 +295,16 @@ class Test_Handler_Handler(object):
         rv = self.app.get('/follow/{0}.json'.format(str(uuid.uuid4())))
         assert rv.status_code == 404
         assert len(dummy.actions) == 13
+        rv = self.app.get('/back_to_start.json')
+        headers = [('Content-Type', 'application/json')]
+        url_go = str(uuid.uuid4())
+        data = {'url': url_go}
+        json_data = json.dumps(data)
+        json_data_length = len(json_data)
+        headers.append(('Content-Length', json_data_length))
+        rv = self.app.post('/go_to_url', headers=headers, data=json_data)
+        json_returned = json.loads(rv.data.decode('utf-8'))
+        assert rv.status_code == 200
+        action_i += 1
+        assert dummy.actions[action_i]['action'] == 'get'
+        assert dummy.actions[action_i]['target'] == url_go

@@ -10,7 +10,6 @@ from Main.singleton import singleton
 
 @singleton
 class Site:
-#    _url = None
     _name = None
     _pages = None
     _connections = None
@@ -30,10 +29,6 @@ class Site:
     def __repr__(self):
         return "<Site ('%s')>" % (self._name)
 
-#    @property
-#    def url(self):
-#        return self._url
-#
     @property
     def name(self):
         return self._name
@@ -42,10 +37,6 @@ class Site:
     def current(self):
         return self._current
 
-#    @property
-#    def hostname(self):
-#        return urlparse(self._url).hostname
-#
     def get_uniq_id(self, html_source, url):
         return hashlib.md5(html_source.encode('utf-8')).hexdigest()
 
@@ -93,9 +84,6 @@ class Site:
         connection = self._connections[connection_id]
         if connection['type'] == self.ConnectionTypes.START:
             return Action(type=Action.ActionType.GET, data={'url' : connection['data']['url']}, connection=connection_id)
-#        if 'url' in connection['data']:
-#            xpath = "//a[contains(@href, '%s')]" % (connection['data']['url'][len(self._url):] if self._url in connection['data']['url'] else connection['data']['url'])
-#            return Action(type=Action.ActionType.CLICK, data={'xpath' : xpath, 'find' : lambda driver: driver.find_element_by_xpath(xpath)}, connection=connection_id)
         if 'css' in connection['data']:
             css = connection['data']['css']
             nb = connection['data']['nb']

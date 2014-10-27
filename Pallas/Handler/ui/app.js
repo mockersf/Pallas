@@ -71,21 +71,31 @@
     $scope.connections = [];
     $scope.selected = null;
     $scope.nodeTab = 'none';
+    $scope.css_searched = false;
 
-    $scope.set_node = function(node) {
-      $scope.node = node;
+    $scope.reset_current_node = function() {
+      $scope.node = "";
       $scope.results = [];
       $scope.connections = [];
       $scope.docu = null;
       $scope.selected = null;
       $scope.nodeTab = 'none';
+      $scope.css_selector = "";
+      $scope.css_searched = false;
+    }
+
+    $scope.set_node = function(node) {
+      $scope.reset_current_node();
       if (node != "") {
+        $scope.node = node;
         $http.get('/details/' + node + '.json').success(function(data){
           $scope.node_url = data.url;
           $scope.html_source = data.html;
           $scope.docu = (new DOMParser()).parseFromString($scope.html_source, 'text/html');
           $scope.has_path_from_current = data.has_path;
           $scope.nodeTab = 'cssSelector';
+          if (node == "start")
+            $scope.nodeTab = 'URL';
           data.connections.forEach(function(connection) {
             details = {
               connection: connection.connection,
@@ -100,6 +110,7 @@
 
     $scope.follow_connection = function(index) {
       connection_id = $scope.connections[index].id;
+      $scope.reset_current_node();
       $http.get('/follow/' + connection_id + '.json').success(function(data){
         $scope.siteData.current_node = data.current_page
         s = sigma.instances()[0];
@@ -111,6 +122,7 @@
       var results = [].slice.call($scope.docu.querySelectorAll($scope.css_selector));
       $scope.results = [];
       $scope.selected = null;
+      $scope.css_searched = true;
       var i = 1;
       var match;
       results.forEach(function(result) {
@@ -125,6 +137,18 @@
       })
     };
 
+    $scope.go_to_url = function() {
+        $scope.reset_current_node();
+        config = {};
+        config['url'] = $scope.url;
+        $http.post('/go_to_url', JSON.stringify(config))
+          .success(function(data){
+            $scope.siteData.current_node = data.current_page
+            s = sigma.instances()[0];
+            sigma.parsers.gexf(parseXml(data.gexf), s, placeNodes);
+          });
+    };
+
     $scope.view_match = function(id) {
       $scope.selected = id;
     };
@@ -133,6 +157,7 @@
       var connection = {};
       connection['css'] = $scope.css_selector;
       connection['nb'] = id;
+      $scope.reset_current_node();
       $http.post('/add_connection_and_go', JSON.stringify(connection))
         .success(function(data){
           $scope.siteData.current_node = data.current_page
@@ -143,6 +168,7 @@
 
     $scope.follow_existing_connections = function(page_id) {
       var query = {};
+      $scope.reset_current_node();
       query['target'] = page_id;
       $http.post('/follow_existing_connections', JSON.stringify(query))
         .success(function(data){

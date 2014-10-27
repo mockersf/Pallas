@@ -1,61 +1,32 @@
-/* general container */
-.frame {
-  width: 960px;
-  margin: 0px auto 0px auto;
-  background-color: white;
-}
-
-#intro {
-  width: 100%;
-  height: 30px;
+#intro.row {
+  height: 45px;
+  margin: 0px;
   background-color: blue;
 }
 
-#intro form {
+.intro_left {
+  display: table-cell;
   float: left;
+  margin: 5px;
 }
 
-#intro a {
+.intro_right {
+  display: table-cell;
   float: right;
+  margin: 5px;
 }
 
-#container {
-  width: 100%;
+#main.row {
   height: 600px;
+  margin: 0px;
 }
 
-#graph-container {
-  height: 100%;
-  width: 760px;
-  float: left;
-  background-color: white;
-}
-
-#details {
-  height: 100%;
-  width: 200px;
+.sidebar {
   background-color: yellow;
-  float: right;
+  height: 100%
 }
 
-/* tabs for options on a node */
-.nodenav {
-    list-style-type: none;
-    margin: 0;
-    padding: 0;
-    overflow: hidden;
-}
-
-li.nodenavpill {
-    float: left;
-    background-color: #DDDDDD;
-    display: block;
-    width: 100px;
-    text-align: center;
-    text-color: #555555;
-}
-
-li.nodenavpillactive {
-    background-color: #FFFFFF;
-    text-color: #000000;
+.graph_zone {
+  background-color: white;
+  height: 100%
 }
