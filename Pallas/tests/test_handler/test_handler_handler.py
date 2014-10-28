@@ -23,11 +23,14 @@ class Test_Handler_Handler(object):
         assert b"Pallas" in rv.data
 
     def test_static(self):
-        rv = self.app.get('/s/zut')
+        rv = self.app.get('/js/zut')
         assert rv.status_code == 404
-        rv = self.app.get('/s/app.js')
+        rv = self.app.get('/js/app.js')
         assert rv.status_code == 200
         assert b"angular" in rv.data
+        rv = self.app.get('/css/style.css')
+        assert rv.status_code == 200
+        assert b"background-color" in rv.data
 
     def test_config(self):
         from Main.Configuration import Configuration

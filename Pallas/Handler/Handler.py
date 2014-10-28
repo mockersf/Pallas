@@ -106,7 +106,17 @@ def follow(connection):
     action.do()
     return jsonify(gexf=etree.tostring(site.get_gexf()).decode('utf-8'), current_page=site.current)
 
-@app.route('/s/<path:filename>')
-def send_file(filename):
+@app.route('/js/<path:filename>')
+def sef_js(filename):
+    return send_file(filename, 'js')
+
+@app.route('/css/<path:filename>')
+def sef_css(filename):
+    return send_file(filename, 'css')
+
+def send_file(filename, subfolder=None):
     rootdir = os.path.abspath(os.path.dirname(__file__))
-    return send_from_directory(os.path.join(rootdir, 'ui'), filename)
+    dir = os.path.join(rootdir, 'ui')
+    if subfolder is not None:
+        dir = os.path.join(dir, subfolder)
+    return send_from_directory(dir, filename)
