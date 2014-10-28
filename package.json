@@ -1,0 +1,9 @@
+{
+  "name": "Pallas",
+  "main": "Pallas/Handler/ui/index.html",
+  "window": {
+		"toolbar": false,
+    "width": 1250,
+    "height": 645
+	}
+}
