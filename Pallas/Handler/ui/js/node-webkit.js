@@ -1,7 +1,16 @@
-//example of how to launch a process
-//var spawn = require('child_process').spawn,
-//grep  = spawn('pwd');
-
-//console.log('Spawned child pid: ' + grep.pid);
-//grep.stdin.end();
 console.log('woohoooo');
+
+var spawn = require('child_process').spawn,
+    ls    = spawn('python', ['Pallas/pallas.py']);
+
+ls.stdout.on('data', function (data) {
+  console.log('stdout: ' + data);
+});
+
+ls.stderr.on('data', function (data) {
+  console.log('stderr: ' + data);
+});
+
+ls.on('close', function (code) {
+  console.log('child process exited with code ' + code);
+});
