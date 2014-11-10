@@ -2,6 +2,8 @@ import hashlib
 import logging
 import uuid
 
+from gexf import Gexf
+
 from .Page import Page
 from Main.Action import Action
 
@@ -14,6 +16,7 @@ class Site:
     _pages = None
     _connections = None
     _current = None
+    _gexf_xml = None
 
     class ConnectionTypes:
         LINK = "link"
@@ -142,7 +145,6 @@ class Site:
                 logging.info("'%s' -> '%s'" % (id, self._connections[id]))
 
     def get_gexf(self):
-        from gexf import Gexf
         gexf = Gexf("Pallas", self.name)
         graph = gexf.addGraph("directed", "static", "Current site exploration")
         graph.addNode('start', 'start')
@@ -153,4 +155,5 @@ class Site:
         for page in self._pages:
             for id in [id for id in self._connections if self._connections[id]['from'] == page and self._connections[id]['explored']]:
               graph.addEdge(id, self._connections[id]['from'], self._connections[id]['to'])
-        return gexf.getXML()
+        self._gexf_xml = gexf.getXML()
+	return self._gexf_xml

@@ -135,7 +135,7 @@ class Test_Handler_Handler(object):
         site = Site()
         json_returned = json.loads(rv.data.decode('utf-8'))
         assert rv.status_code == 200
-        assert json_returned['gexf'] == etree.tostring(site.get_gexf()).decode('utf-8')
+        assert json_returned['gexf'] == etree.tostring(site._gexf_xml).decode('utf-8')
         assert json_returned['current_page'] == site.current
         assert conf.browser == 'Dummy'
         assert conf.proxy_path is None
@@ -151,7 +151,7 @@ class Test_Handler_Handler(object):
         rv = self.app.post('/get_from_start', headers=headers, data=json_data)
         json_returned = json.loads(rv.data.decode('utf-8'))
         assert rv.status_code == 200
-        assert json_returned['gexf'] == etree.tostring(site.get_gexf()).decode('utf-8')
+        assert json_returned['gexf'] == etree.tostring(site._gexf_xml).decode('utf-8')
         assert json_returned['current_page'] == site.current
         assert site.current != 'start'
         action_i = 0
@@ -193,7 +193,7 @@ class Test_Handler_Handler(object):
         rv = self.app.post('/get_from_start', headers=headers, data=json_data)
         json_returned = json.loads(rv.data.decode('utf-8'))
         assert rv.status_code == 200
-        assert json_returned['gexf'] == etree.tostring(site.get_gexf()).decode('utf-8')
+        assert json_returned['gexf'] == etree.tostring(site._gexf_xml).decode('utf-8')
         assert json_returned['current_page'] == site.current
         assert site.current != 'start'
         action_i = 0
@@ -209,7 +209,7 @@ class Test_Handler_Handler(object):
         site = Site()
         json_returned = json.loads(rv.data.decode('utf-8'))
         assert rv.status_code == 200
-        assert json_returned['gexf'] == etree.tostring(site.get_gexf()).decode('utf-8')
+        assert json_returned['gexf'] == etree.tostring(site._gexf_xml).decode('utf-8')
         assert json_returned['current_page'] == site.current
         assert len(dummy.actions) == 3
         action_i += 1
@@ -250,7 +250,7 @@ class Test_Handler_Handler(object):
         rv = self.app.post('/add_connection_and_go', headers=headers, data=json_data)
         json_returned = json.loads(rv.data.decode('utf-8'))
         assert rv.status_code == 200
-        assert json_returned['gexf'] == etree.tostring(site.get_gexf()).decode('utf-8')
+        assert json_returned['gexf'] == etree.tostring(site._gexf_xml).decode('utf-8')
         assert json_returned['current_page'] == site.current
         assert len(dummy.actions) == 8
         action_i += 1
