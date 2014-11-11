@@ -156,4 +156,4 @@ class Site:
             for id in [id for id in self._connections if self._connections[id]['from'] == page and self._connections[id]['explored']]:
               graph.addEdge(id, self._connections[id]['from'], self._connections[id]['to'])
         self._gexf_xml = gexf.getXML()
-	return self._gexf_xml
+        return self._gexf_xml
