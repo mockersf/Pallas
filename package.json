@@ -1,8 +1,8 @@
 {
   "name": "Pallas",
-  "main": "Pallas/Handler/ui/index.html",
+  "main": "node-webkit/index.html",
   "window": {
-		"toolbar": false,
+    "toolbar": false,
     "width": 1250,
     "height": 645
 	}

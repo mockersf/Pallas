@@ -1,3 +1,16 @@
+function getParameterByName(name) {
+    name = name.replace(/[\[]/, "\\[").replace(/[\]]/, "\\]");
+    var regex = new RegExp("[\\?&]" + name + "=([^&#]*)"),
+        results = regex.exec(location.search);
+    return results === null ? "" : decodeURIComponent(results[1].replace(/\+/g, " "));
+}
+
+host = ""
+if (getParameterByName('from') != "") {
+    console.log('we have a from parameter');
+    host = "http://localhost:5000"
+}
+
 (function() {
   var app = angular.module('target', []);
 
@@ -18,7 +31,7 @@
 
     var target = this;
 
-    $http.get('/default-target.json').success(function(data){
+    $http.get(host + '/default-target.json').success(function(data){
       target.url = data.url;
       if (data.proxy) {
         target.proxy = 'browsermob';
@@ -35,7 +48,7 @@
         config['browser'] = target.browser;
         config['proxy'] = target.proxy;
         config['proxy_path'] = target.proxy_path;
-        $http.post('/start', JSON.stringify(config))
+        $http.post(host + '/start', JSON.stringify(config))
           .success(function(data){
             target.siteData.current_node = data.current_page
             s = sigma.instances()[0];
@@ -52,7 +65,7 @@
     };
 
     this.back_to_start = function() {
-      $http.get('/back_to_start.json')
+      $http.get(host + '/back_to_start.json')
         .success(function(data){
           target.siteData.current_node = data.current_page
           s = sigma.instances()[0];
@@ -88,7 +101,7 @@
       $scope.reset_current_node();
       if (node != "") {
         $scope.node = node;
-        $http.get('/details/' + node + '.json').success(function(data){
+        $http.get(host + '/details/' + node + '.json').success(function(data){
           $scope.node_url = data.url;
           $scope.html_source = data.html;
           $scope.docu = (new DOMParser()).parseFromString($scope.html_source, 'text/html');
@@ -111,7 +124,7 @@
     $scope.follow_connection = function(index) {
       connection_id = $scope.connections[index].id;
       $scope.reset_current_node();
-      $http.get('/follow/' + connection_id + '.json').success(function(data){
+      $http.get(host + '/follow/' + connection_id + '.json').success(function(data){
         $scope.siteData.current_node = data.current_page
         s = sigma.instances()[0];
         sigma.parsers.gexf(parseXml(data.gexf), s, placeNodes);
@@ -141,7 +154,7 @@
         $scope.reset_current_node();
         config = {};
         config['url'] = $scope.url;
-        $http.post('/go_to_url', JSON.stringify(config))
+        $http.post(host + '/go_to_url', JSON.stringify(config))
           .success(function(data){
             $scope.siteData.current_node = data.current_page
             s = sigma.instances()[0];
@@ -158,7 +171,7 @@
       connection['css'] = $scope.css_selector;
       connection['nb'] = id;
       $scope.reset_current_node();
-      $http.post('/add_connection_and_go', JSON.stringify(connection))
+      $http.post(host + '/add_connection_and_go', JSON.stringify(connection))
         .success(function(data){
           $scope.siteData.current_node = data.current_page
           s = sigma.instances()[0];
@@ -170,7 +183,7 @@
       var query = {};
       $scope.reset_current_node();
       query['target'] = page_id;
-      $http.post('/follow_existing_connections', JSON.stringify(query))
+      $http.post(host + '/follow_existing_connections', JSON.stringify(query))
         .success(function(data){
           $scope.siteData.current_node = data.current_page
           s = sigma.instances()[0];
